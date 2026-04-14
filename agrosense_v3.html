@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AGROSENSe Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#07100a;color:#d1fae5;font-family:'JetBrains Mono',monospace;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;background:#0a180a;border:1px solid #1a4a1a;border-radius:6px;color:#d1fae5;padding:8px 10px;font-size:12px;width:100%;outline:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:#1a4a1a;border-radius:3px}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.15}}
+.dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:bl 2s infinite;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div style="background:linear-gradient(90deg,#052e16,#0a1f0a,#052e16);border-bottom:1px solid #166534;padding:8px 12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="background:#16a34a;border-radius:7px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🌿</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#4ade80">AGROSENSe Pro</div>
+        <div style="font-size:9px;color:#6b7280">Invernadero Piloto A · 38 módulos</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap" id="slots"></div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <div style="background:#450a0a;border:1px solid #ef4444;border-radius:16px;padding:2px 8px;font-size:10px;color:#fca5a5">⚠3</div>
+      <button onclick="showSetup()" style="background:#052e16;border:1px solid #166534;border-radius:16px;color:#4ade80;padding:2px 10px;font-size:10px">+Finca</button>
+      <div class="dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VARIABLE SELECTOR -->
+<div id="var-row" style="display:flex;gap:6px;padding:7px 12px;overflow-x:auto;background:#090f09;border-bottom:1px solid #1a3a1a"></div>
+
+<!-- TABS -->
+<div style="display:flex;background:#0a1a0a;border-bottom:1px solid #166534">
+  <button class="tbtn active" onclick="switchTab('mapa',this)" style="flex:1;border:none;border-bottom:2px solid #4ade80;background:#0f2d0f;color:#4ade80;padding:9px 4px;font-size:13px">🗺</button>
+  <button class="tbtn" onclick="switchTab('t3d',this)"  style="flex:1;border:none;border-bottom:2px solid transparent;background:transparent;color:#6b7280;padding:9px 4px;font-size:13px">🧊</button>
+  <button class="tbtn" onclick="switchTab('finca',this)"style="flex:1;border:none;border-bottom:2px solid transparent;background:transparent;color:#6b7280;padding:9px 4px;font-size:13px">🌾</button>
+  <button class="tbtn" onclick="switchTab('alerts',this)"style="flex:1;border:none;border-bottom:2px solid transparent;background:transparent;color:#6b7280;padding:9px 4px;font-size:12px">🚨3</button>
+  <button class="tbtn" onclick="switchTab('model',this)" style="flex:1;border:none;border-bottom:2px solid transparent;background:transparent;color:#6b7280;padding:9px 4px;font-size:13px">📐</button>
+</div>
+
+<!-- CONTENT -->
+<div style="padding:12px;overflow:auto;min-height:60vh">
+
+  <!-- MAPA 2D -->
+  <div id="tab-mapa" class="tab-content active">
+    <div id="var-title" style="font-size:10px;color:#4ade80;margin-bottom:6px">🌡 Temp Aire · IDW · 12 PM</div>
+    <canvas id="hmap" style="border-radius:8px;display:block;max-width:100%"></canvas>
+    <div id="legend-bar" style="display:flex;align-items:center;gap:5px;margin:5px 0">
+      <span id="leg-min" style="font-size:9px;color:#6b7280"></span>
+      <canvas id="leg-canvas" style="flex:1;height:10px;border-radius:4px"></canvas>
+      <span id="leg-max" style="font-size:9px;color:#6b7280"></span>
+    </div>
+    <div style="font-size:8px;color:#374151;margin-bottom:10px">● puntos reales · gradiente IDW interpolado</div>
+    <div id="stats-row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+    <div style="font-size:10px;color:#4ade80;margin-bottom:7px;letter-spacing:1px">RECORRIDOS HOY</div>
+    <div id="rec-list"></div>
+  </div>
+
+  <!-- 3D -->
+  <div id="tab-t3d" class="tab-content">
+    <div id="v3d-title" style="font-size:10px;color:#4ade80;margin-bottom:8px">🧊 Vista 3D · Arrastra para rotar</div>
+    <canvas id="c3d" style="border-radius:10px;display:block;max-width:100%;cursor:grab;touch-action:none"></canvas>
+    <canvas id="leg2" style="display:block;width:100%;height:10px;border-radius:4px;margin:6px 0"></canvas>
+    <div style="margin-top:10px;padding:12px;background:#050f1a;border:1px solid #1a2a5a;border-radius:8px">
+      <div style="font-size:10px;color:#60a5fa;margin-bottom:5px">📷 RECONSTRUCCIÓN FOTOGRAMÉTRICA</div>
+      <div style="font-size:10px;color:#9ca3af">Cuando el carro tenga cámaras OV5640, esta vista se reemplaza con la nube de puntos 3D real del invernadero.</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <span style="background:#0a1a3a;border:1px solid #1a2a5a;border-radius:4px;padding:2px 8px;font-size:9px;color:#93c5fd">Nube RGB (próx.)</span>
+        <span style="background:#0a1a3a;border:1px solid #1a2a5a;border-radius:4px;padding:2px 8px;font-size:9px;color:#93c5fd">NDVI (próx.)</span>
+        <span style="background:#0a1a3a;border:1px solid #1a2a5a;border-radius:4px;padding:2px 8px;font-size:9px;color:#93c5fd">Mesh 3D (próx.)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINCA -->
+  <div id="tab-finca" class="tab-content">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:10px;color:#4ade80;letter-spacing:1px">🌾 FINCA PILOTO</div>
+      <button onclick="showSetup()" style="background:#16a34a22;border:1px solid #4ade80;color:#4ade80;border-radius:8px;padding:4px 12px;font-size:10px">+ Nueva</button>
+    </div>
+    <div style="background:#0a180a;border:1px solid #1a4a1a;border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:14px;font-weight:700;color:#d1fae5;margin-bottom:3px">🌿 Invernadero Piloto A</div>
+      <div style="font-size:10px;color:#6b7280;margin-bottom:10px">Túnel multi-capilla · Polietileno 200 micras</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px">
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Estructura</div><div style="font-size:10px;color:#d1fae5;margin-top:1px">Túnel multi-capilla</div></div>
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Riego</div><div style="font-size:10px;color:#d1fae5;margin-top:1px">Goteo presurizado</div></div>
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Área total</div><div style="font-size:10px;color:#d1fae5;margin-top:1px">1.51 ha</div></div>
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Módulos</div><div style="font-size:10px;color:#d1fae5;margin-top:1px">38 (19 filas × 2 col)</div></div>
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Cultivos</div><div style="font-size:10px;color:#d1fae5;margin-top:1px">Tomate Cherry / Pepino</div></div>
+        <div style="background:#050f05;border-radius:6px;padding:7px 9px"><div style="font-size:8px;color:#6b7280">Estado</div><div style="font-size:10px;color:#4ade80;margin-top:1px">✓ Activa</div></div>
+      </div>
+      <div style="font-size:10px;color:#9ca3af;padding:8px 10px;background:#050f05;border-radius:6px">38 módulos independientes, pasillo central. Ventilación cenital lateral. Malla anti-insectos perimetral.</div>
+    </div>
+    <div style="background:#0a180a;border:1px solid #1a4a1a;border-radius:12px;padding:14px;margin-bottom:10px">
+      <div style="font-size:10px;color:#4ade80;margin-bottom:10px">SEMANAS FENOLÓGICAS ACTIVAS</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:8px"><div style="background:#16a34a;border-radius:4px;padding:2px 10px;font-size:10px;color:#fff;min-width:58px;text-align:center">Sem. 8</div><div style="font-size:10px;color:#9ca3af">10 mód · Tomate Cherry</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="background:#ca8a04;border-radius:4px;padding:2px 10px;font-size:10px;color:#fff;min-width:58px;text-align:center">Sem. 5</div><div style="font-size:10px;color:#9ca3af">10 mód · Tomate Cherry</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="background:#ea580c;border-radius:4px;padding:2px 10px;font-size:10px;color:#fff;min-width:58px;text-align:center">Sem. 3</div><div style="font-size:10px;color:#9ca3af">10 mód · Pepino</div></div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="background:#dc2626;border-radius:4px;padding:2px 10px;font-size:10px;color:#fff;min-width:58px;text-align:center">Sem. 1</div><div style="font-size:10px;color:#9ca3af">8 mód · Pepino</div></div>
+      </div>
+    </div>
+    <div style="background:#0a180a;border:1px solid #1a4a1a;border-radius:12px;padding:14px">
+      <div style="font-size:10px;color:#4ade80;margin-bottom:8px">PLANO ESQUEMÁTICO</div>
+      <svg viewBox="0 0 260 500" style="width:100%;max-width:260px;border-radius:6px;background:#050f05;display:block" id="plano-svg"></svg>
+      <div style="font-size:8px;color:#4b5563;margin-top:5px">Colores = semana fenológica · Las cámaras generarán el plano 3D real</div>
+    </div>
+  </div>
+
+  <!-- ALERTAS -->
+  <div id="tab-alerts" class="tab-content">
+    <div style="font-size:10px;color:#4ade80;letter-spacing:1px;margin-bottom:10px">🚨 ALERTAS DEL AGENTE MATEMÁTICO · 3 activas</div>
+    <div id="alert-list"></div>
+  </div>
+
+  <!-- MODELO -->
+  <div id="tab-model" class="tab-content">
+    <div id="model-title" style="font-size:10px;color:#4ade80;letter-spacing:1px;margin-bottom:10px">📐 MODELOS MATEMÁTICOS</div>
+    <div id="model-list"></div>
+    <div style="padding:12px;background:#050f05;border:1px solid #1a3a1a;border-radius:8px;margin-top:6px">
+      <div style="font-size:9px;color:#4ade80;margin-bottom:7px">MÉTODOS DISPONIBLES</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#0f2d0f;border:1px solid #4ade80;color:#4ade80;border-radius:4px;padding:1px 8px;font-size:9px;min-width:60px;text-align:center">IDW</span><span style="font-size:9px;color:#4ade80">✓ Activo</span></div>
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#0a180a;border:1px solid #1a3a1a;color:#4b5563;border-radius:4px;padding:1px 8px;font-size:9px;min-width:60px;text-align:center">Kriging</span><span style="font-size:9px;color:#4b5563">Próxima fase</span></div>
+        <div style="display:flex;gap:8px;align-items:center"><span style="background:#0a180a;border:1px solid #1a3a1a;color:#4b5563;border-radius:4px;padding:1px 8px;font-size:9px;min-width:60px;text-align:center">RF</span><span style="font-size:9px;color:#4b5563">Random Forest — Próxima fase</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div style="background:#050d05;border-top:1px solid #1a3a1a;padding:5px 12px;display:flex;justify-content:space-between;font-size:8px;color:#374151">
+  <span>AGROSENSe Pro v1.0 · Datos simulados</span>
+  <span id="ft-time"></span>
+</div>
+
+<!-- SETUP MODAL -->
+<div id="setup-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;align-items:center;justify-content:center;padding:12px">
+  <div style="background:#0d1a0d;border:1px solid #166534;border-radius:14px;width:100%;max-width:480px;max-height:88vh;overflow:auto">
+    <div style="padding:16px 18px 12px;border-bottom:1px solid #1a3a1a;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:14px;font-weight:700;color:#4ade80">🌿 Nueva Finca / Zona</div>
+      <button onclick="hideSetup()" style="background:none;border:none;color:#6b7280;font-size:18px">✕</button>
+    </div>
+    <div style="padding:14px 18px 18px;display:flex;flex-direction:column;gap:12px">
+      <div><label style="font-size:10px;color:#4ade80;display:block;margin-bottom:4px">NOMBRE</label><input type="text" placeholder="Ej: Invernadero Norte Lote 3"/></div>
+      <div><label style="font-size:10px;color:#4ade80;display:block;margin-bottom:4px">UBICACIÓN</label><input type="text" placeholder="Municipio, Departamento"/></div>
+      <div><label style="font-size:10px;color:#4ade80;display:block;margin-bottom:4px">TIPO</label>
+        <select><option>invernadero</option><option>casa malla</option><option>campo abierto</option><option>frutal</option><option>forestal</option></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div><label style="font-size:9px;color:#4ade80;display:block;margin-bottom:3px">FILAS</label><input type="number" value="19"/></div>
+        <div><label style="font-size:9px;color:#4ade80;display:block;margin-bottom:3px">COLS</label><input type="number" value="2"/></div>
+        <div><label style="font-size:9px;color:#4ade80;display:block;margin-bottom:3px">RIEGO</label>
+          <select><option>goteo</option><option>aspersion</option><option>nebulizacion</option></select>
+        </div>
+      </div>
+      <div><label style="font-size:10px;color:#4ade80;display:block;margin-bottom:4px">CULTIVOS</label><input type="text" placeholder="Tomate Cherry, Pepino..."/></div>
+      <div><label style="font-size:10px;color:#4ade80;display:block;margin-bottom:4px">NOTAS</label><textarea style="height:65px;resize:vertical" placeholder="Características especiales..."></textarea></div>
+      <div style="display:flex;justify-content:flex-end">
+        <button onclick="hideSetup()" style="background:#16a34a;border:none;border-radius:8px;color:#fff;padding:10px 24px;font-size:12px">Guardar ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+var VARS = {
+  temp_aire:    {l:"Temp Aire",    u:"°C",   ic:"🌡", mn:18, mx:35, c:["#0ea5e9","#22c55e","#eab308","#f97316","#ef4444"]},
+  hum_aire:     {l:"Humedad Aire", u:"%RH",  ic:"💧", mn:40, mx:95, c:["#3b82f6","#06b6d4","#22c55e","#eab308","#ef4444"]},
+  co2_ppm:      {l:"CO₂",          u:"ppm",  ic:"🌬", mn:400,mx:900,c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"]},
+  hum_sustrato: {l:"Hum Sustrato", u:"%VWC", ic:"🌱", mn:40, mx:85, c:["#ef4444","#f97316","#22c55e","#0ea5e9","#3b82f6"]},
+  ce_sustrato:  {l:"CE Sustrato",  u:"mS/cm",ic:"⚡", mn:1.5,mx:3.5,c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"]},
+  radiacion_par:{l:"Rad. PAR",     u:"μmol", ic:"☀️", mn:0,  mx:2200,c:["#1e1b4b","#1d4ed8","#ca8a04","#f97316","#fef9c3"]}
+};
+var SLOT_BASE = {
+  1:{temp_aire:22,hum_aire:78,co2_ppm:480,hum_sustrato:70,ce_sustrato:2.2,radiacion_par:80},
+  2:{temp_aire:26,hum_aire:72,co2_ppm:540,hum_sustrato:68,ce_sustrato:2.3,radiacion_par:650},
+  3:{temp_aire:31,hum_aire:63,co2_ppm:620,hum_sustrato:64,ce_sustrato:2.4,radiacion_par:1850},
+  4:{temp_aire:29,hum_aire:67,co2_ppm:590,hum_sustrato:66,ce_sustrato:2.4,radiacion_par:980},
+  5:{temp_aire:24,hum_aire:75,co2_ppm:510,hum_sustrato:69,ce_sustrato:2.3,radiacion_par:320}
+};
+var MODELS = {
+  temp_aire:    {mn:18,mx:32,amn:20,amx:30,med:27.5},
+  hum_aire:     {mn:55,mx:85,amn:60,amx:82,med:68},
+  co2_ppm:      {mn:400,mx:800,amn:420,amx:750,med:580},
+  hum_sustrato: {mn:60,mx:80,amn:62,amx:78,med:70},
+  ce_sustrato:  {mn:1.8,mx:2.8,amn:2.0,amx:2.6,med:2.3},
+  radiacion_par:{mn:0,mx:2000,amn:50,amx:1800,med:900}
+};
+var ALERTS_DATA = [
+  {v:"temp_aire",    lv:"critico",     tp:"sensor_directo",   val:34.2,thr:32,  xy:"(3.5, 185) m",  msg:"Temperatura crítica fila 6 col izquierda",   ac:"Activar ventilación forzada sector norte", ok:false},
+  {v:"hum_sustrato", lv:"advertencia", tp:"modelo_predictivo", val:58.1,thr:62,  xy:"(18, 370) m",   msg:"Modelo predice déficit hídrico fila 11 der.",  ac:"Revisar goteo sector D-11",                ok:false},
+  {v:"co2_ppm",      lv:"info",        tp:"tendencia",         val:610, thr:600, xy:"(3.5, 72) m",   msg:"CO₂ en tendencia ascendente filas 2-4",        ac:"Monitorear próxima hora",                  ok:false},
+  {v:"ce_sustrato",  lv:"advertencia", tp:"sensor_directo",    val:3.1, thr:2.8, xy:"(18, 259) m",   msg:"CE elevada en fila 8 derecha",                 ac:"Lavado de sustrato recomendado",           ok:true}
+];
+var RECS = [
+  {sl:1,ci:"despejado",pts:76,sem:5},
+  {sl:2,ci:"parcial",  pts:76,sem:5},
+  {sl:3,ci:"despejado",pts:76,sem:5},
+  {sl:4,ci:"nublado",  pts:76,sem:5},
+  {sl:5,ci:"despejado",pts:76,sem:5}
+];
+var SL = {1:"06 AM",2:"09 AM",3:"12 PM",4:"03 PM",5:"06 PM"};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+var curVk = "temp_aire";
+var curSlot = 3;
+var medsCache = {};
+var cam = {theta:.55, phi:1.05, r:480};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function rnd(n){return Math.random()*n*2-n;}
+function hexRgb(h){var m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?[parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]:null;}
+function getColor(val,vk,a){
+  a=a||.88;
+  var cfg=VARS[vk]; if(!cfg) return"#888";
+  var t=Math.max(0,Math.min(1,(val-cfg.mn)/(cfg.mx-cfg.mn)));
+  var cols=cfg.c, n=cols.length, seg=(n-1)*t, i=Math.min(Math.floor(seg),n-2), f=seg-i;
+  var c1=hexRgb(cols[i]),c2=hexRgb(cols[i+1]);
+  if(!c1||!c2)return"#888";
+  return"rgba("+Math.round(c1[0]+f*(c2[0]-c1[0]))+","+Math.round(c1[1]+f*(c2[1]-c1[1]))+","+Math.round(c1[2]+f*(c2[2]-c1[2]))+","+a+")";
+}
+function idw(pts,gx,gy){
+  var n=0,d=0;
+  for(var i=0;i<pts.length;i++){var dx=gx-pts[i].x,dy=gy-pts[i].y,d2=dx*dx+dy*dy;if(d2<.01)return pts[i].v;var w=1/(d2);n+=w*pts[i].v;d+=w;}
+  return d===0?null:n/d;
+}
+function avg(arr){if(!arr.length)return null;var s=0;for(var i=0;i<arr.length;i++)s+=arr[i];return s/arr.length;}
+
+// ── GENERATE MEDS ─────────────────────────────────────────────────────────
+function genMeds(slot){
+  if(medsCache[slot]) return medsCache[slot];
+  var base=SLOT_BASE[slot], pts=[];
+  for(var r=1;r<=19;r++){
+    var yc=(r-1)*37+18;
+    var sf=Math.sin((r/19)*Math.PI);
+    var xs=[1.8,5.2,16.3,19.7];
+    for(var xi=0;xi<xs.length;xi++){
+      var isLeft=xi<2;
+      var p={
+        x:xs[xi]+rnd(.4), y:yc+rnd(5),
+        temp_aire:   +(base.temp_aire   + sf*3   + rnd(.9)).toFixed(1),
+        hum_aire:    +(base.hum_aire    - sf*7   + rnd(1.5)).toFixed(1),
+        co2_ppm:     +(base.co2_ppm     + (r%5)*12 + rnd(18)).toFixed(0),
+        hum_sustrato:+(base.hum_sustrato+ (r%4)*(-2)+ rnd(2.5)).toFixed(1),
+        ce_sustrato: +(base.ce_sustrato + (r%3)*.15 + rnd(.12)).toFixed(2),
+        radiacion_par:+(base.radiacion_par+ rnd(60)).toFixed(0)
+      };
+      pts.push(p);
+    }
+  }
+  medsCache[slot]=pts;
+  return pts;
+}
+
+// ── DRAW HEATMAP ──────────────────────────────────────────────────────────
+function drawHeatmap(){
+  var c=document.getElementById("hmap"); if(!c)return;
+  var W=Math.min(window.innerWidth-24,340);
+  var H=Math.round(W*2.3);
+  c.width=W; c.height=H;
+  var ctx=c.getContext("2d");
+  var IW=21.5,IH=703,sx=W/IW,sy=H/IH;
+  ctx.fillStyle="#0a120a"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#0d160d"; ctx.fillRect(7*sx,0,7.5*sx,H);
+  ctx.save();ctx.translate(7*sx+7.5*sx/2,H/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle="#1e3e1e";ctx.font=(Math.max(9,W*.026))+"px monospace";ctx.textAlign="center";
+  ctx.fillText("PASILLO CENTRAL",0,0);ctx.restore();
+
+  var meds=genMeds(curSlot);
+  var pts=[];
+  for(var i=0;i<meds.length;i++) pts.push({x:meds[i].x,y:meds[i].y,v:meds[i][curVk]});
+
+  var GR=48;
+  var zones=[{x0:0,x1:7},{x0:14.5,x1:21.5}];
+  for(var zi=0;zi<zones.length;zi++){
+    var z=zones[zi];
+    for(var gx=0;gx<GR;gx++){
+      for(var gy=0;gy<GR;gy++){
+        var wx=z.x0+(gx/GR)*(z.x1-z.x0), wy=(gy/GR)*IH;
+        var v=idw(pts,wx,wy); if(v==null)continue;
+        ctx.fillStyle=getColor(v,curVk,.9);
+        ctx.fillRect(wx*sx, wy*sy, ((z.x1-z.x0)/GR)*sx+1, (IH/GR)*sy+1);
+      }
+    }
+  }
+  // Module borders + labels
+  ctx.strokeStyle="rgba(255,255,255,.2)";ctx.lineWidth=.6;
+  var fs=Math.max(7,W*.021);
+  ctx.fillStyle="rgba(255,255,255,.65)";ctx.font=fs+"px monospace";
+  for(var r=1;r<=19;r++){
+    var cols=[{xo:0},{xo:14.5}];
+    for(var ci=0;ci<cols.length;ci++){
+      var xo=cols[ci].xo*sx, yo=(r-1)*37*sy, w=7*sx, h=36*sy;
+      ctx.strokeRect(xo,yo,w,h);
+      ctx.fillText(r+(ci===0?"I":"D"),xo+2,yo+fs+1);
+    }
+  }
+  // Sensor dots
+  for(var i=0;i<pts.length;i++){
+    ctx.beginPath();ctx.arc(pts[i].x*sx,pts[i].y*sy,3,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,.92)";ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,.5)";ctx.lineWidth=.5;ctx.stroke();
+  }
+
+  // Legend
+  var cfg=VARS[curVk];
+  document.getElementById("leg-min").textContent=cfg.mn+cfg.u;
+  document.getElementById("leg-max").textContent=cfg.mx+cfg.u;
+  var lc=document.getElementById("leg-canvas");
+  lc.width=W-60;lc.height=10;
+  var lctx=lc.getContext("2d");
+  for(var i=0;i<50;i++){var vv=cfg.mn+(i/49)*(cfg.mx-cfg.mn);lctx.fillStyle=getColor(vv,curVk,1);lctx.fillRect(i*(lc.width/50),0,lc.width/50+1,10);}
+}
+
+// ── DRAW 3D ───────────────────────────────────────────────────────────────
+function draw3D(){
+  var c=document.getElementById("c3d"); if(!c)return;
+  var W=Math.min(window.innerWidth-24,560);
+  var H=Math.round(W*.68);
+  c.width=W;c.height=H;
+  var ctx=c.getContext("2d");
+  var meds=genMeds(curSlot);
+  var pts=[];for(var i=0;i<meds.length;i++) pts.push({x:meds[i].x,y:meds[i].y,v:meds[i][curVk]});
+
+  function proj(x,y,z){
+    var cx=10.75,cy=351.5,cz=2.25;
+    var dx=x-cx,dy=y-cy,dz=z-cz;
+    var cT=Math.cos(cam.theta),sT=Math.sin(cam.theta);
+    var cP=Math.cos(cam.phi),sP=Math.sin(cam.phi);
+    var rx=dx*cT-dy*sT,ry2=dx*sT+dy*cT;
+    var rz=dz*cP-ry2*sP,rd=ry2*cP+dz*sP+cam.r;
+    var f=480/(rd+1);
+    return{sx:W/2+rx*f,sy:H/2-rz*f};
+  }
+  var bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,"#0c1a0c");bg.addColorStop(1,"#060e06");
+  ctx.fillStyle=bg;ctx.clearRect(0,0,W,H);ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="rgba(34,197,94,.07)";ctx.lineWidth=.4;
+  for(var i=0;i<=22;i+=2){var a=proj(i,0,0),b=proj(i,703,0);ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke();}
+  for(var j=0;j<=703;j+=74){var a=proj(0,j,0),b=proj(21.5,j,0);ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(b.sx,b.sy);ctx.stroke();}
+  var cols2=[{x0:0,x1:7},{x0:14.5,x1:21.5}];
+  for(var row=1;row<=19;row++){
+    for(var ci=0;ci<2;ci++){
+      var col=cols2[ci],yO=(row-1)*37,cx2=(col.x0+col.x1)/2,cy2=yO+18;
+      var v=pts.length>=2?idw(pts,cx2,cy2):null;
+      var fill=v!=null?getColor(v,curVk,.8):"rgba(20,45,20,.4)";
+      var C=[proj(col.x0,yO,0),proj(col.x1,yO,0),proj(col.x1,yO+36,0),proj(col.x0,yO+36,0)];
+      var T=[proj(col.x0,yO,4.5),proj(col.x1,yO,4.5),proj(col.x1,yO+36,4.5),proj(col.x0,yO+36,4.5)];
+      ctx.beginPath();ctx.moveTo(C[0].sx,C[0].sy);for(var k=1;k<4;k++)ctx.lineTo(C[k].sx,C[k].sy);
+      ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle="rgba(0,0,0,.2)";ctx.lineWidth=.3;ctx.stroke();
+      var wp=[[0,1],[1,2],[2,3],[3,0]];
+      for(var wi=0;wi<4;wi++){var wa=wp[wi][0],wb=wp[wi][1];
+        ctx.beginPath();ctx.moveTo(C[wa].sx,C[wa].sy);ctx.lineTo(T[wa].sx,T[wa].sy);ctx.lineTo(T[wb].sx,T[wb].sy);ctx.lineTo(C[wb].sx,C[wb].sy);
+        ctx.closePath();ctx.fillStyle=v!=null?getColor(v,curVk,.28):"rgba(12,30,12,.28)";ctx.fill();
+        ctx.strokeStyle="rgba(0,0,0,.1)";ctx.lineWidth=.2;ctx.stroke();
+      }
+      ctx.beginPath();ctx.moveTo(T[0].sx,T[0].sy);for(var k=1;k<4;k++)ctx.lineTo(T[k].sx,T[k].sy);
+      ctx.closePath();ctx.fillStyle=v!=null?getColor(v,curVk,.42):"rgba(15,40,15,.2)";ctx.fill();
+      ctx.strokeStyle="rgba(74,222,128,.1)";ctx.lineWidth=.4;ctx.stroke();
+      if(v!=null){var lp=proj(cx2,cy2,4.9);ctx.fillStyle="rgba(255,255,255,.75)";ctx.font="bold "+(Math.max(6,W*.011))+"px monospace";ctx.textAlign="center";ctx.fillText(row+(ci===0?"I":"D"),lp.sx,lp.sy);}
+    }
+  }
+  for(var i=0;i<pts.length;i++){
+    var sp=proj(pts[i].x,pts[i].y,1.2);
+    var g=ctx.createRadialGradient(sp.sx,sp.sy,0,sp.sx,sp.sy,6);
+    g.addColorStop(0,"rgba(255,255,255,.95)");g.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.beginPath();ctx.arc(sp.sx,sp.sy,6,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  }
+  // Legend 2
+  var cfg=VARS[curVk];
+  var lc2=document.getElementById("leg2");
+  lc2.width=W;lc2.height=10;
+  var lctx2=lc2.getContext("2d");
+  for(var i=0;i<60;i++){var vv=cfg.mn+(i/59)*(cfg.mx-cfg.mn);lctx2.fillStyle=getColor(vv,curVk,1);lctx2.fillRect(i*(W/60),0,W/60+1,10);}
+}
+
+// ── BUILD SLOTS ───────────────────────────────────────────────────────────
+function buildSlots(){
+  var el=document.getElementById("slots"); el.innerHTML="";
+  for(var s=1;s<=5;s++){
+    (function(sl){
+      var btn=document.createElement("button");
+      btn.textContent=SL[sl];
+      btn.style.cssText="border-radius:5px;padding:3px 7px;font-size:10px;font-family:monospace;cursor:pointer;";
+      btn.id="slot-btn-"+sl;
+      btn.onclick=function(){setSlot(sl);};
+      el.appendChild(btn);
+    })(s);
+  }
+  updateSlotStyles();
+}
+function updateSlotStyles(){
+  for(var s=1;s<=5;s++){
+    var b=document.getElementById("slot-btn-"+s);
+    if(!b)continue;
+    if(s===curSlot){b.style.background="#16a34a";b.style.border="1px solid #4ade80";b.style.color="#fff";}
+    else{b.style.background="#0f2010";b.style.border="1px solid #1f4d1f";b.style.color="#6b7280";}
+  }
+}
+function setSlot(s){curSlot=s;updateSlotStyles();refreshAll();}
+
+// ── BUILD VAR ROW ─────────────────────────────────────────────────────────
+function buildVarRow(){
+  var el=document.getElementById("var-row"); el.innerHTML="";
+  for(var k in VARS){
+    (function(vk){
+      var cfg=VARS[vk];
+      var meds=genMeds(curSlot);
+      var vals=[];for(var i=0;i<meds.length;i++) vals.push(meds[i][vk]);
+      var av=avg(vals);
+      var btn=document.createElement("button");
+      btn.id="vbtn-"+vk;
+      btn.style.cssText="flex-shrink:0;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;font-size:10px;font-family:monospace;cursor:pointer;";
+      btn.innerHTML='<span style="font-size:15px">'+cfg.ic+'</span><div><div style="font-size:9px">'+cfg.l+'</div><div style="font-size:11px;font-weight:600" id="vval-'+vk+'">'+(av!=null?(av.toFixed(1)+cfg.u):"—")+'</div></div>';
+      btn.onclick=function(){setVk(vk);};
+      el.appendChild(btn);
+    })(k);
+  }
+  updateVarStyles();
+}
+function updateVarStyles(){
+  for(var k in VARS){
+    var b=document.getElementById("vbtn-"+k);
+    if(!b)continue;
+    if(k===curVk){b.style.background="#0f2d0f";b.style.border="1px solid #4ade80";b.style.color="#4ade80";}
+    else{b.style.background="transparent";b.style.border="1px solid #1a3a1a";b.style.color="#6b7280";}
+    // Update values
+    var meds=genMeds(curSlot);
+    var vals=[];for(var i=0;i<meds.length;i++) vals.push(meds[i][k]);
+    var av=avg(vals);
+    var vv=document.getElementById("vval-"+k);
+    if(vv) vv.textContent=av!=null?(av.toFixed(1)+VARS[k].u):"—";
+  }
+}
+function setVk(k){curVk=k;updateVarStyles();refreshAll();}
+
+// ── BUILD STATS ROW ───────────────────────────────────────────────────────
+function buildStats(){
+  var el=document.getElementById("stats-row"); if(!el)return;
+  var meds=genMeds(curSlot), cfg=VARS[curVk];
+  var vals=[];for(var i=0;i<meds.length;i++) vals.push(meds[i][curVk]);
+  var a=avg(vals);if(a==null)return;
+  var mn=vals[0],mx=vals[0];
+  for(var i=1;i<vals.length;i++){if(vals[i]<mn)mn=vals[i];if(vals[i]>mx)mx=vals[i];}
+  var std=Math.sqrt(avg(vals.map(function(v){return(v-a)*(v-a);})));
+  el.innerHTML="";
+  var items=[["Prom",a.toFixed(1)+" "+cfg.u],["Mín",mn.toFixed(1)],["Máx",mx.toFixed(1)],["σ","±"+std.toFixed(1)],["N pts",vals.length]];
+  for(var i=0;i<items.length;i++){
+    var d=document.createElement("div");
+    d.style.cssText="background:#0a180a;border:1px solid #1a3a1a;border-radius:6px;padding:5px 9px;min-width:55px";
+    d.innerHTML='<div style="font-size:8px;color:#6b7280">'+items[i][0]+'</div><div style="font-size:11px;color:#d1fae5;font-weight:600">'+items[i][1]+'</div>';
+    el.appendChild(d);
+  }
+  // Update title
+  var t=document.getElementById("var-title");
+  if(t) t.textContent=cfg.ic+" "+cfg.l+" · IDW · "+SL[curSlot];
+}
+
+// ── BUILD RECORRIDOS ──────────────────────────────────────────────────────
+function buildRecs(){
+  var el=document.getElementById("rec-list"); if(!el)return;
+  el.innerHTML="";
+  var ciIcons={despejado:"☀️",parcial:"⛅",nublado:"☁️",lluvia:"🌧️"};
+  for(var i=0;i<RECS.length;i++){
+    (function(r){
+      var d=document.createElement("div");
+      d.style.cssText="background:"+(curSlot===r.sl?"#0f2d0f":"#0a180a")+";border:1px solid "+(curSlot===r.sl?"#4ade80":"#1a3a1a")+";border-radius:8px;padding:8px 12px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;align-items:center";
+      d.innerHTML='<div><div style="font-size:11px;color:#d1fae5;font-weight:600">Slot '+r.sl+' · '+SL[r.sl]+'</div><div style="font-size:9px;color:#6b7280;margin-top:2px">'+r.pts+' puntos · Sem. fenol. '+r.sem+'</div></div><span style="font-size:18px">'+(ciIcons[r.ci]||"☀️")+'</span>';
+      d.onclick=function(){setSlot(r.sl);};
+      el.appendChild(d);
+    })(RECS[i]);
+  }
+}
+
+// ── BUILD ALERTS ──────────────────────────────────────────────────────────
+function buildAlerts(){
+  var el=document.getElementById("alert-list"); if(!el)return;
+  el.innerHTML="";
+  var lc={critico:"#ef4444",advertencia:"#f97316",info:"#22c55e"};
+  for(var i=0;i<ALERTS_DATA.length;i++){
+    var a=ALERTS_DATA[i],c=lc[a.lv]||"#22c55e";
+    var cfg=VARS[a.v];
+    var d=document.createElement("div");
+    d.style.cssText="background:"+(a.ok?"#0a180a":c+"0e")+";border:1px solid "+(a.ok?"#1a3a1a":c+"44")+";border-left:3px solid "+(a.ok?"#1a3a1a":c)+";border-radius:10px;padding:11px 14px;margin-bottom:8px;opacity:"+(a.ok?.5:1);
+    d.innerHTML=
+      '<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap">'+
+        '<span style="background:'+c+'22;border:1px solid '+c+';color:'+c+';border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700">'+a.lv.toUpperCase()+'</span>'+
+        '<span style="font-size:10px;color:#9ca3af">'+cfg.ic+' '+cfg.l+'</span>'+
+        '<span style="font-size:9px;color:#4b5563;background:#0f1a0f;border:1px solid #1a3a1a;border-radius:4px;padding:1px 5px">'+a.tp.replace(/_/g," ")+'</span>'+
+        (a.ok?'<span style="font-size:9px;color:#22c55e">✓ Resuelta</span>':'')+
+      '</div>'+
+      '<div style="font-size:11px;color:#e5e7eb;margin-bottom:4px">'+a.msg+'</div>'+
+      '<div style="font-size:10px;color:#4ade80;margin-bottom:5px">→ '+a.ac+'</div>'+
+      '<div style="font-size:9px;color:#4b5563">Medido: <b style="color:#fca5a5">'+a.val+' '+cfg.u+'</b> · Umbral: <b style="color:#fbbf24">'+a.thr+'</b> · '+a.xy+'</div>';
+    el.appendChild(d);
+  }
+}
+
+// ── BUILD MODELS ──────────────────────────────────────────────────────────
+function buildModels(){
+  var el=document.getElementById("model-list"); if(!el)return;
+  el.innerHTML="";
+  var t=document.getElementById("model-title");
+  if(t) t.textContent="📐 MODELOS MATEMÁTICOS · Slot "+curSlot+" · "+SL[curSlot];
+  for(var k in MODELS){
+    var m=MODELS[k], cfg=VARS[k];
+    var meds=genMeds(curSlot);
+    var vals=[];for(var i=0;i<meds.length;i++) vals.push(meds[i][k]);
+    var a=avg(vals);
+    var status=a==null?"—":a>m.mx?"SOBRE LÍM":a<m.mn?"BAJO LÍM":(a>m.amx||a<m.amn)?"ALERTA":"NORMAL";
+    var sc={"NORMAL":"#22c55e","ALERTA":"#f97316","SOBRE LÍM":"#ef4444","BAJO LÍM":"#3b82f6","—":"#6b7280"}[status];
+    var pct=a!=null?Math.max(0,Math.min(100,((a-m.mn)/(m.mx-m.mn))*100)):null;
+    var apct=((m.amn-m.mn)/(m.mx-m.mn))*100;
+    var bpct=((m.amx-m.mn)/(m.mx-m.mn))*100;
+    var d=document.createElement("div");
+    d.style.cssText="background:#0a180a;border:1px solid #1a4a1a;border-radius:10px;padding:13px 14px;margin-bottom:10px";
+    d.innerHTML=
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+        '<div style="font-size:13px;color:#d1fae5;font-weight:600">'+cfg.ic+' '+cfg.l+'</div>'+
+        '<span style="background:'+sc+'22;border:1px solid '+sc+';color:'+sc+';border-radius:4px;padding:2px 9px;font-size:10px">'+status+'</span>'+
+      '</div>'+
+      '<div style="font-size:8px;color:#4b5563;display:flex;justify-content:space-between;margin-bottom:3px">'+
+        '<span>'+m.mn+'</span><span>Media: '+m.med+' '+cfg.u+'</span><span>'+m.mx+'</span>'+
+      '</div>'+
+      '<div style="background:#1a3a1a;border-radius:4px;height:14px;position:relative;overflow:hidden;margin-bottom:6px">'+
+        '<div style="position:absolute;top:0;height:100%;background:rgba(249,115,22,.2);left:'+apct+'%;width:'+(bpct-apct)+'%"></div>'+
+        '<div style="position:absolute;top:2px;height:10px;background:linear-gradient(90deg,#16a34a,#4ade80,#16a34a);border-radius:3px;left:'+apct+'%;width:'+(bpct-apct)+'%"></div>'+
+        (pct!=null?'<div style="position:absolute;top:-1px;width:3px;height:16px;background:'+sc+';border-radius:2px;left:'+pct+'%"></div>':'')+
+      '</div>'+
+      (a!=null?'<div style="font-size:11px;color:'+sc+'">Actual: <b>'+a.toFixed(2)+' '+cfg.u+'</b>'+(status!=="NORMAL"?" · Δ"+Math.abs(a-m.med).toFixed(2)+" vs media":"")+'</div>':'<div style="font-size:10px;color:#4b5563">Sin datos</div>');
+    el.appendChild(d);
+  }
+}
+
+// ── BUILD SVG PLANO ───────────────────────────────────────────────────────
+function buildPlano(){
+  var svg=document.getElementById("plano-svg"); if(!svg)return;
+  var semCol={8:"#16a34a",5:"#ca8a04",3:"#ea580c",1:"#dc2626"};
+  var ns="http://www.w3.org/2000/svg";
+  var r=document.createElementNS(ns,"rect");
+  r.setAttribute("x","96");r.setAttribute("y","0");r.setAttribute("width","68");r.setAttribute("height","500");r.setAttribute("fill","#0f1a0f");svg.appendChild(r);
+  var t=document.createElementNS(ns,"text");
+  t.setAttribute("x","130");t.setAttribute("y","253");t.setAttribute("text-anchor","middle");t.setAttribute("fill","#1e3a1e");t.setAttribute("font-size","9");t.setAttribute("font-family","monospace");t.textContent="PASILLO";svg.appendChild(t);
+  for(var i=0;i<19;i++){
+    var sem=i<5?8:i<10?5:i<15?3:1, c=semCol[sem];
+    var pairs=[[3,88],[168,88]];
+    for(var pi=0;pi<2;pi++){
+      var rx=pairs[pi][0],rw=pairs[pi][1];
+      var rect=document.createElementNS(ns,"rect");
+      rect.setAttribute("x",rx);rect.setAttribute("y",3+i*26);rect.setAttribute("width",rw);rect.setAttribute("height",23);
+      rect.setAttribute("fill",c+"33");rect.setAttribute("stroke","rgba(255,255,255,.15)");rect.setAttribute("stroke-width",".4");svg.appendChild(rect);
+      var lbl=document.createElementNS(ns,"text");
+      lbl.setAttribute("x",rx+5);lbl.setAttribute("y",3+i*26+15);lbl.setAttribute("fill","rgba(255,255,255,.65)");lbl.setAttribute("font-size","7");lbl.setAttribute("font-family","monospace");
+      lbl.textContent=(i+1)+(pi===0?"I":"D");svg.appendChild(lbl);
+    }
+  }
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll(".tab-content").forEach(function(el){el.classList.remove("active");});
+  document.querySelectorAll(".tbtn").forEach(function(b){b.style.background="transparent";b.style.borderBottom="2px solid transparent";b.style.color="#6b7280";});
+  document.getElementById("tab-"+id).classList.add("active");
+  btn.style.background="#0f2d0f";btn.style.borderBottom="2px solid #4ade80";btn.style.color="#4ade80";
+  if(id==="mapa")drawHeatmap();
+  if(id==="t3d"){draw3D();init3DDrag();}
+}
+
+// ── 3D DRAG ───────────────────────────────────────────────────────────────
+var drag3d=null;
+function init3DDrag(){
+  var c=document.getElementById("c3d"); if(!c||c._drag)return;
+  c._drag=true;
+  c.addEventListener("mousedown",function(e){drag3d={x:e.clientX,y:e.clientY};});
+  c.addEventListener("mousemove",function(e){if(!drag3d)return;cam.theta-=(e.clientX-drag3d.x)*.007;cam.phi=Math.max(.3,Math.min(1.5,cam.phi+(e.clientY-drag3d.y)*.007));drag3d={x:e.clientX,y:e.clientY};draw3D();});
+  c.addEventListener("mouseup",function(){drag3d=null;});
+  c.addEventListener("mouseleave",function(){drag3d=null;});
+  c.addEventListener("touchstart",function(e){var t=e.touches[0];drag3d={x:t.clientX,y:t.clientY};},{passive:true});
+  c.addEventListener("touchmove",function(e){e.preventDefault();if(!drag3d)return;var t=e.touches[0];cam.theta-=(t.clientX-drag3d.x)*.007;cam.phi=Math.max(.3,Math.min(1.5,cam.phi+(t.clientY-drag3d.y)*.007));drag3d={x:t.clientX,y:t.clientY};draw3D();},{passive:false});
+  c.addEventListener("touchend",function(){drag3d=null;});
+}
+
+// ── SETUP MODAL ───────────────────────────────────────────────────────────
+function showSetup(){var m=document.getElementById("setup-modal");m.style.display="flex";}
+function hideSetup(){var m=document.getElementById("setup-modal");m.style.display="none";}
+
+// ── FOOTER TIME ───────────────────────────────────────────────────────────
+function updateTime(){var el=document.getElementById("ft-time");if(el)el.textContent=new Date().toLocaleString("es-CO",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});}
+
+// ── REFRESH ALL ───────────────────────────────────────────────────────────
+function refreshAll(){
+  updateVarStyles();
+  drawHeatmap();
+  buildStats();
+  buildRecs();
+  buildModels();
+  var t=document.getElementById("v3d-title");
+  if(t) t.textContent="🧊 Vista 3D · "+VARS[curVk].ic+" "+VARS[curVk].l+" · Arrastra para rotar";
+  // Redraw 3D if visible
+  var tab3d=document.getElementById("tab-t3d");
+  if(tab3d&&tab3d.classList.contains("active")) draw3D();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+window.addEventListener("resize",function(){drawHeatmap();});
+updateTime();setInterval(updateTime,30000);
+buildSlots();
+buildVarRow();
+buildAlerts();
+buildModels();
+buildPlano();
+buildStats();
+buildRecs();
+drawHeatmap();
+</script>
+</body>
+</html>
