@@ -516,6 +516,7 @@ function doLogin(){
   else if(u==="productor@agrosense.co"&&p==="agro2026"){ok=true;uRole="productor";}
   if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();setTimeout(function(){try{greetVoice(curUserName);}catch(e){}},900);try{loadQuickPrompts();loadSystemStatus();}catch(e){}}
   else document.getElementById("l-err").style.display="block";
+  
 }
 function doLogout(){document.getElementById("s-app").classList.remove("active");document.getElementById("s-login").classList.add("active");}
 document.getElementById("l-p").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
