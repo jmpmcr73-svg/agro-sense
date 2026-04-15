@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>AGROSENSe Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#040d06;--bg2:#081209;--bg3:#0b1a0e;--bg4:#0f2214;
+  --green:#22c55e;--green2:#4ade80;--green3:#16a34a;
+  --amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--purple:#a78bfa;
+  --text:#e2f5e6;--text2:#94a3b8;--text3:#4b6455;
+  --border:#1a3a20;--border2:#0f2214;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-display);min-height:100vh;overflow-x:hidden}
+button,input,select,textarea{font-family:var(--font-display)}
+input,select,textarea{outline:none;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:12px;width:100%}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2322c55e' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.fade{animation:fadeIn .3s ease both}
+.pulse{animation:pulse 2s infinite}
+.screen{display:none}.screen.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.label{font-size:9px;color:var(--text2);letter-spacing:1.5px;text-transform:uppercase;font-weight:600}
+.val{font-family:var(--font-mono);font-weight:700}
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-ok{background:#22c55e15;border:1px solid #22c55e40;color:#22c55e}
+.badge-warn{background:#f59e0b15;border:1px solid #f59e0b40;color:#f59e0b}
+.badge-crit{background:#ef444415;border:1px solid #ef444440;color:#ef4444}
+.badge-info{background:#3b82f615;border:1px solid #3b82f640;color:#3b82f6}
+/* Nav */
+.nav-btn{flex-shrink:0;border:none;background:transparent;color:var(--text2);padding:9px 12px;font-size:11px;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--font-display);font-weight:500;transition:all .2s}
+.nav-btn.active{border-bottom:2px solid var(--green);color:var(--green);background:var(--bg3)}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeIn .3s ease}
+/* Variable chips */
+.vchip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:10px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s;white-space:nowrap;font-weight:500}
+.vchip.active{border-color:var(--green);background:#22c55e12;color:var(--green)}
+/* Threshold bar */
+.thr-bar{height:8px;border-radius:4px;background:var(--bg3);position:relative;overflow:hidden}
+.thr-optimal{position:absolute;height:100%;background:#22c55e22;border-left:1px solid #22c55e55;border-right:1px solid #22c55e55}
+.thr-current{position:absolute;top:-2px;width:3px;height:12px;border-radius:2px}
+/* Structure selector */
+.struct-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px}
+.struct-card:hover,.struct-card.active{border-color:var(--green);background:#22c55e0a}
+.struct-card.active .struct-dot{background:var(--green)}
+.struct-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:background .2s}
+/* Agent panel */
+.agent-avatar{width:44px;height:44px;border-radius:50%;border:2px solid var(--green);overflow:hidden;flex-shrink:0}
+.agent-badge{background:var(--green3);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;position:absolute;bottom:0;right:0}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="s-login" class="screen active">
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 40% 20%,#0a2e14 0%,#040d06 65%)">
+  <div style="width:100%;max-width:360px">
+    <div style="text-align:center;margin-bottom:36px">
+      <div style="width:68px;height:68px;background:linear-gradient(135deg,#16a34a,#4ade80);border-radius:20px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 40px #16a34a33">🌿</div>
+      <div style="font-size:26px;font-weight:700;color:var(--green2);letter-spacing:-0.5px">AGROSENSe Pro</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;font-family:var(--font-mono)">Sistema de Monitoreo Ambiental IA</div>
+    </div>
+    <div class="card" style="border-color:#1a4a20">
+      <div class="label" style="margin-bottom:16px;text-align:center">Acceso al sistema</div>
+      <div style="margin-bottom:12px">
+        <div class="label" style="margin-bottom:5px">Usuario</div>
+        <input id="l-u" type="text" value="admin@agrosense.co" placeholder="usuario@email.com"/>
+      </div>
+      <div style="margin-bottom:20px">
+        <div class="label" style="margin-bottom:5px">Contraseña</div>
+        <input id="l-p" type="password" value="agro2026" placeholder="••••••••"/>
+      </div>
+      <button onclick="doLogin()" style="width:100%;background:linear-gradient(135deg,#16a34a,#15803d);border:none;border-radius:10px;color:#fff;padding:13px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 20px #16a34a33">
+        Ingresar al sistema →
+      </button>
+      <div id="l-err" style="display:none;font-size:10px;color:var(--red);text-align:center;margin-top:10px">Credenciales incorrectas</div>
+    </div>
+    <div style="text-align:center;margin-top:14px;font-size:9px;color:var(--text3);font-family:var(--font-mono)">admin@agrosense.co · agro2026</div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="s-app" class="screen">
+
+<!-- TOP BAR -->
+<div style="background:linear-gradient(90deg,#041a08,#061508,#041a08);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:8px">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="background:var(--green3);border-radius:8px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌿</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--green2)">AGROSENSe Pro</div>
+      <div id="top-cliente" style="font-size:9px;color:var(--text2);font-family:var(--font-mono)">—</div>
+    </div>
+  </div>
+  <!-- Agent JP -->
+  <div style="display:flex;align-items:center;gap:8px">
+    <div id="alert-count" style="background:#ef444415;border:1px solid #ef444440;border-radius:12px;padding:2px 8px;font-size:10px;color:#ef4444;display:none">⚠ 0</div>
+    <div class="pulse" style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+    <div style="position:relative;cursor:pointer" onclick="showAgentPanel()">
+      <div class="agent-avatar">
+        <img src="data:image/jpeg;base64,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" style="width:100%;height:100%;object-fit:cover"/>
+      </div>
+      <div class="agent-badge">🤖</div>
+    </div>
+    <button onclick="doLogout()" style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);padding:3px 10px;font-size:10px;cursor:pointer">↩</button>
+  </div>
+</div>
+
+<!-- CLIENT + STRUCTURE SELECTOR BAR -->
+<div style="background:var(--bg2);border-bottom:1px solid var(--border);padding:8px 12px">
+  <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">
+      <span style="font-size:9px;color:var(--text2);white-space:nowrap">CLIENTE</span>
+      <select id="sel-cliente" onchange="onClienteChange()" style="flex:1;font-size:11px;background:var(--bg3)">
+        <option value="hidroexpo">🏢 Condominio HidroExpo</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">
+      <span style="font-size:9px;color:var(--text2);white-space:nowrap">TIPO</span>
+      <select id="sel-tipo" onchange="onTipoChange()" style="flex:1;font-size:11px;background:var(--bg3)">
+        <option value="invernadero">🏗 Invernaderos (35)</option>
+        <option value="casa_malla">🕸 Casas Malla (8)</option>
+        <option value="campo_abierto">🌾 Campo Abierto (35 ha)</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:120px">
+      <span style="font-size:9px;color:var(--text2);white-space:nowrap">ESTRUCTURA</span>
+      <select id="sel-estructura" onchange="onEstructuraChange()" style="flex:1;font-size:11px;background:var(--bg3)">
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- VARIABLE SELECTOR -->
+<div style="display:flex;gap:6px;padding:7px 12px;overflow-x:auto;background:var(--bg);border-bottom:1px solid var(--border2)" id="var-row"></div>
+
+<!-- NAV -->
+<div style="background:var(--bg2);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 8px" id="nav-menu">
+  <button class="nav-btn active" onclick="showTab('t-dash',this)">🏠 Dashboard</button>
+  <button class="nav-btn" onclick="showTab('t-mapa',this)">🗺 Mapa Calor</button>
+  <button class="nav-btn" onclick="showTab('t-graf',this)">📊 Gráficas</button>
+  <button class="nav-btn" onclick="showTab('t-robot',this)">🤖 Robot</button>
+  <button class="nav-btn" onclick="showTab('t-prod',this)">🌾 Productor</button>
+  <button class="nav-btn" onclick="showTab('t-alert',this)">🚨 Alertas</button>
+</div>
+
+<!-- CONTENT -->
+<div style="padding:12px">
+
+<!-- DASHBOARD -->
+<div id="t-dash" class="tab-pane active fade">
+  <!-- Invernadero visual -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">🏗 <span id="dash-struct-title">Invernadero 01 — Tomate Cherry · Sem.2</span></div>
+    <canvas id="inv-canvas" style="width:100%;border-radius:8px;display:block;cursor:pointer" height="190"></canvas>
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      <span style="font-size:8px;color:var(--text3)">Toca zona para detalle</span>
+      <span id="sel-zone" style="font-size:8px;color:var(--green)"></span>
+    </div>
+  </div>
+  <!-- KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px" id="kpi-row"></div>
+  <!-- Punto-alturas info -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">📍 PUNTOS POR PASILLO · <span style="color:var(--green)">30 pts = 10+10+10</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <div style="background:var(--bg);border-radius:8px;padding:8px;border-left:2px solid var(--green)">
+        <div class="label">Sustrato</div>
+        <div class="val" style="font-size:18px;color:var(--green)">10</div>
+        <div style="font-size:8px;color:var(--text2)">z=0 cm</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px;border-left:2px solid var(--amber)">
+        <div class="label">Medio</div>
+        <div class="val" style="font-size:18px;color:var(--amber)">10</div>
+        <div style="font-size:8px;color:var(--text2)">z=1.2 m</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px;border-left:2px solid var(--blue)">
+        <div class="label">Alto</div>
+        <div class="val" style="font-size:18px;color:var(--blue)">10</div>
+        <div style="font-size:8px;color:var(--text2)">z=2.0 m</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;background:var(--bg);border-radius:6px;padding:7px;font-size:10px;color:var(--text2)">
+      📐 <b style="color:var(--text)">30 pts × <span id="n-pasillos">14</span> pasillos × 5 slots = <span id="n-meds-dia">2,100</span> mediciones/día</b>
+    </div>
+  </div>
+  <!-- Últimas mediciones -->
+  <div class="card">
+    <div class="label" style="margin-bottom:8px">🕐 ÚLTIMAS MEDICIONES — IoT FIJO</div>
+    <div id="last-meds"></div>
+  </div>
+</div>
+
+<!-- MAPA CALOR -->
+<div id="t-mapa" class="tab-pane">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <select id="map-slot" onchange="redrawMap()" style="flex:1;min-width:90px;font-size:11px">
+      <option value="1">06 AM</option><option value="2">09 AM</option>
+      <option value="3" selected>12 PM</option><option value="4">03 PM</option><option value="5">06 PM</option>
+    </select>
+    <select id="map-z" onchange="redrawMap()" style="flex:1;min-width:90px;font-size:11px">
+      <option value="0">z=0 Sustrato</option>
+      <option value="1.2" selected>z=1.2m Medio</option>
+      <option value="2.0">z=2.0m Alto</option>
+    </select>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div id="map-title" class="label" style="margin-bottom:8px"></div>
+    <canvas id="hmap" style="width:100%;border-radius:8px;display:block"></canvas>
+    <div style="display:flex;align-items:center;gap:5px;margin-top:6px">
+      <span id="leg-min" style="font-size:9px;color:var(--text2)"></span>
+      <canvas id="leg-c" style="flex:1;height:8px;border-radius:4px"></canvas>
+      <span id="leg-max" style="font-size:9px;color:var(--text2)"></span>
+    </div>
+    <div style="font-size:8px;color:var(--text3);margin-top:3px">● puntos reales · gradiente IDW · umbral min/max marcados</div>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:8px">PROMEDIO POR ZONA</div>
+    <div id="zone-bars"></div>
+  </div>
+</div>
+
+<!-- GRÁFICAS -->
+<div id="t-graf" class="tab-pane">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <select id="gr-zona" onchange="drawCharts()" style="flex:1;font-size:11px">
+      <option value="all">Todas las zonas (promedio)</option>
+    </select>
+  </div>
+
+  <!-- Chart 1: Evolución diaria con min/max visible -->
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div class="label">EVOLUCIÓN DIARIA — 5 SLOTS</div>
+      <div id="gr-stats" style="display:flex;gap:8px"></div>
+    </div>
+    <canvas id="chart-day" height="170" style="width:100%;display:block"></canvas>
+    <div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap" id="chart-day-legend"></div>
+  </div>
+
+  <!-- Chart 2: Perfil Z -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PERFIL VERTICAL — VALOR POR ALTURA Z</div>
+    <canvas id="chart-z" height="150" style="width:100%;display:block"></canvas>
+    <div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--green)">■ z=0 Sustrato</span>
+      <span style="font-size:9px;color:var(--amber)">■ z=1.2m</span>
+      <span style="font-size:9px;color:var(--blue)">■ z=2.0m</span>
+    </div>
+  </div>
+
+  <!-- Chart 3: Barras máx/mín/prom por zona -->
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">MÁX · MÍN · PROM — POR ZONA</div>
+    <canvas id="chart-mmm" height="160" style="width:100%;display:block"></canvas>
+    <div style="display:flex;gap:10px;margin-top:5px">
+      <span style="font-size:9px;color:var(--red)">■ Máx</span>
+      <span style="font-size:9px;color:var(--green)">■ Prom</span>
+      <span style="font-size:9px;color:var(--blue)">■ Mín</span>
+    </div>
+  </div>
+
+  <!-- Tabla con rangos min/max -->
+  <div class="card">
+    <div class="label" style="margin-bottom:8px">TABLA ESTADÍSTICA + UMBRALES</div>
+    <div id="stats-table" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- ROBOT -->
+<div id="t-robot" class="tab-pane">
+  <div class="label" style="margin-bottom:12px">🤖 OPERACIÓN ROBOT CAR — RECORRIDO</div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PASO 1 — PRODUCTOR</div>
+    <select id="rob-prod" onchange="robStep2()" style="font-size:12px">
+      <option value="">-- Seleccione --</option>
+      <option value="0">Juan Pablo Moreno — HidroExpo</option>
+    </select>
+  </div>
+  <div id="rob-s2" class="card" style="margin-bottom:10px;opacity:.4">
+    <div class="label" style="margin-bottom:8px">PASO 2 — ESTRUCTURA A RECORRER</div>
+    <select id="rob-struct" style="font-size:12px;margin-bottom:10px">
+      <option value="">-- Seleccione estructura --</option>
+    </select>
+  </div>
+  <div id="rob-s3" class="card" style="margin-bottom:10px;opacity:.4">
+    <div class="label" style="margin-bottom:8px">PASO 3 — CONFIGURACIÓN</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div><div class="label" style="margin-bottom:4px">SLOT</div>
+        <select id="rob-slot" style="font-size:11px"><option value="1">06 AM</option><option value="2">09 AM</option><option value="3" selected>12 PM</option><option value="4">03 PM</option><option value="5">06 PM</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">ALTURA Z</div>
+        <select id="rob-z" style="font-size:11px"><option value="0">z=0 Sustrato</option><option value="1.2" selected>z=1.2m</option><option value="2.0">z=2.0m</option><option value="all">Todos (3 pasadas)</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">CONDICIÓN</div>
+        <select id="rob-cielo" style="font-size:11px"><option>☀️ Despejado</option><option>⛅ Parcial</option><option>☁️ Nublado</option><option>🌧️ Lluvia</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">MODO</div>
+        <select id="rob-modo" style="font-size:11px"><option>Automático</option><option>Manual</option><option>Calibración IoT</option></select></div>
+    </div>
+    <div class="label" style="margin-bottom:5px">ZONAS A RECORRER</div>
+    <canvas id="rob-canvas" height="130" style="width:100%;border-radius:8px;border:1px solid var(--border);cursor:pointer;display:block"></canvas>
+    <div style="font-size:8px;color:var(--text3);margin-top:3px"><span style="color:var(--green)">■</span> Activo &nbsp;<span style="color:var(--text3)">■</span> Inactivo</div>
+  </div>
+  <div id="rob-s4" class="card" style="opacity:.4">
+    <div class="label" style="margin-bottom:10px">PASO 4 — INICIAR</div>
+    <div id="rob-summary" style="background:var(--bg);border-radius:8px;padding:10px;margin-bottom:10px;font-size:10px;color:var(--text2)"></div>
+    <button onclick="startRobot()" style="width:100%;background:linear-gradient(135deg,#16a34a,#15803d);border:none;border-radius:10px;color:#fff;padding:12px;font-size:13px;font-weight:700;cursor:pointer">🤖 INICIAR RECORRIDO</button>
+    <div id="rob-prog" style="display:none;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text2);margin-bottom:4px">
+        <span id="rob-lbl">Iniciando...</span><span id="rob-pct">0%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;overflow:hidden">
+        <div id="rob-bar" style="background:linear-gradient(90deg,var(--green3),var(--green2));height:100%;width:0%;transition:width .4s;border-radius:4px"></div>
+      </div>
+      <div id="rob-live" style="margin-top:8px;display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTOR -->
+<div id="t-prod" class="tab-pane">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="label">🌾 GESTIÓN DE PRODUCTORES</div>
+    <button onclick="document.getElementById('prod-form').style.display='block'" style="background:#22c55e12;border:1px solid var(--green);color:var(--green);border-radius:8px;padding:5px 12px;font-size:10px;cursor:pointer;font-family:var(--font-display)">+ Nuevo</button>
+  </div>
+  <!-- HidroExpo card -->
+  <div class="card" style="margin-bottom:10px;border-color:#22c55e22">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:42px;height:42px;border-radius:50%;border:2px solid var(--green);overflow:hidden;flex-shrink:0">
+          <img src="data:image/jpeg;base64,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" style="width:100%;height:100%;object-fit:cover"/>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)">Condominio HidroExpo</div>
+          <div style="font-size:10px;color:var(--text2)">Juan Pablo Moreno · jp@hidroexpo.co</div>
+        </div>
+      </div>
+      <span class="badge badge-ok">ACTIVO</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+      <div style="background:var(--bg);border-radius:7px;padding:7px 8px">
+        <div class="label">Invernaderos</div>
+        <div class="val" style="font-size:16px;color:var(--green)">35</div>
+        <div style="font-size:8px;color:var(--text3)">7×2 = 14 zonas c/u</div>
+      </div>
+      <div style="background:var(--bg);border-radius:7px;padding:7px 8px">
+        <div class="label">Casas Malla</div>
+        <div class="val" style="font-size:16px;color:var(--amber)">8</div>
+        <div style="font-size:8px;color:var(--text3)">7×2 = 14 zonas c/u</div>
+      </div>
+      <div style="background:var(--bg);border-radius:7px;padding:7px 8px">
+        <div class="label">Campo Abierto</div>
+        <div class="val" style="font-size:16px;color:var(--blue)">35 ha</div>
+        <div style="font-size:8px;color:var(--text3)">8 zonas × 1250m²</div>
+      </div>
+    </div>
+    <div style="font-size:9px;color:var(--text2);background:var(--bg);border-radius:6px;padding:6px 8px">
+      Zipaquirá, Cundinamarca · 2,600 msnm · NIT 900.123.456-7
+    </div>
+  </div>
+  <!-- New producer form -->
+  <div id="prod-form" style="display:none" class="card">
+    <div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:12px">+ NUEVO PRODUCTOR / FINCA</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div class="label" style="margin-bottom:3px">NOMBRE</div><input placeholder="Juan Pérez"/></div>
+      <div><div class="label" style="margin-bottom:3px">EMPRESA</div><input placeholder="Empresa S.A.S"/></div>
+      <div><div class="label" style="margin-bottom:3px">FINCA</div><input placeholder="Finca El Progreso"/></div>
+      <div><div class="label" style="margin-bottom:3px">MUNICIPIO</div><input placeholder="Zipaquirá"/></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="document.getElementById('prod-form').style.display='none'" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);padding:7px 14px;font-size:11px;cursor:pointer">Cancelar</button>
+      <button onclick="document.getElementById('prod-form').style.display='none'" style="background:var(--green3);border:none;border-radius:8px;color:#fff;padding:7px 14px;font-size:11px;cursor:pointer;font-weight:600">Guardar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTAS -->
+<div id="t-alert" class="tab-pane">
+  <div class="label" style="margin-bottom:10px">🚨 ALERTAS DEL AGENTE MATEMÁTICO</div>
+  <div id="alert-list" style="display:flex;flex-direction:column;gap:8px"></div>
+</div>
+
+</div><!-- content -->
+</div><!-- app -->
+
+<!-- AGENT PANEL (slide in) -->
+<div id="agent-panel" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.75)" onclick="hideAgentPanel()">
+  <div onclick="event.stopPropagation()" style="position:absolute;right:0;top:0;bottom:0;width:min(320px,95vw);background:var(--bg2);border-left:1px solid var(--border);animation:slideIn .3s ease;display:flex;flex-direction:column">
+    <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+      <div style="width:52px;height:52px;border-radius:50%;border:2px solid var(--green);overflow:hidden;flex-shrink:0">
+        <img src="data:image/jpeg;base64,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" style="width:100%;height:100%;object-fit:cover"/>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">Juan Pablo Moreno</div>
+        <div style="font-size:10px;color:var(--text2)">Agente Tech · HidroExpo</div>
+        <div style="font-size:9px;color:var(--green);font-family:var(--font-mono)">🟢 En línea</div>
+      </div>
+    </div>
+    <div style="padding:16px;flex:1;overflow-y:auto">
+      <div style="font-size:11px;font-weight:600;color:var(--green2);margin-bottom:10px">Resumen del sistema</div>
+      <div id="agent-stats" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+  </div>
+</div>
+
+<div style="background:var(--bg2);border-top:1px solid var(--border2);padding:5px 12px;display:flex;justify-content:space-between;font-size:8px;color:var(--text3);font-family:var(--font-mono)">
+  <span>AGROSENSe Pro v2.0 · HidroExpo</span>
+  <span id="ft-time"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// VARIABLES & CONFIG
+// ══════════════════════════════════════════════════════
+var VARS = {
+  temp_aire:    {l:"Temp Aire",     u:"°C",      ic:"🌡", mn:16, mx:38, omn:20, omx:30, c:["#0ea5e9","#22c55e","#eab308","#f97316","#ef4444"], tipos:["invernadero","casa_malla","campo_abierto"]},
+  hum_aire:     {l:"Hum Aire",      u:"%RH",     ic:"💧", mn:40, mx:95, omn:60, omx:82, c:["#3b82f6","#06b6d4","#22c55e","#eab308","#ef4444"], tipos:["invernadero","casa_malla","campo_abierto"]},
+  co2_ppm:      {l:"CO₂",           u:"ppm",     ic:"🌬", mn:380,mx:900,omn:420,omx:750, c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"], tipos:["invernadero","casa_malla"]},
+  hum_sustrato: {l:"Hum Sustrato",  u:"%VWC",    ic:"🌱", mn:40, mx:85, omn:62, omx:78, c:["#ef4444","#f97316","#22c55e","#0ea5e9","#3b82f6"], tipos:["invernadero","casa_malla"]},
+  ce_sustrato:  {l:"CE Sustrato",   u:"mS/cm",   ic:"⚡", mn:1.2,mx:3.8,omn:2.0,omx:2.6,c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"], tipos:["invernadero","casa_malla"]},
+  radiacion_par:{l:"Rad PAR",       u:"μmol/m²s",ic:"☀️", mn:0,  mx:2200,omn:50,omx:1800,c:["#1e1b4b","#1d4ed8","#ca8a04","#f97316","#fef9c3"],tipos:["invernadero","casa_malla"]},
+  ch4_ppm:      {l:"Metano CH₄",    u:"ppm",     ic:"🔥", mn:0,  mx:50, omn:0,  omx:5,  c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"], tipos:["invernadero","casa_malla","campo_abierto"]},
+  etileno_ppm:  {l:"Etileno C₂H₄",  u:"ppm",     ic:"🧪", mn:0,  mx:0.2,omn:0, omx:0.02,c:["#22c55e","#84cc16","#eab308","#f97316","#ef4444"],tipos:["invernadero","casa_malla"]},
+  radiacion_solar_wm2:{l:"Rad Solar",u:"W/m²",   ic:"🌤", mn:0,  mx:1400,omn:50,omx:1100,c:["#1e1b4b","#1d4ed8","#ca8a04","#f97316","#fef9c3"],tipos:["invernadero","casa_malla","campo_abierto"]},
+  evaporacion_mm:{l:"Evaporación",  u:"mm/h",    ic:"💦", mn:0,  mx:20, omn:0.5,omx:10, c:["#3b82f6","#06b6d4","#22c55e","#eab308","#ef4444"], tipos:["invernadero","casa_malla","campo_abierto"]},
+  campo_mag_ut: {l:"Campo Mag",     u:"μT",      ic:"🧲", mn:20, mx:60, omn:25, omx:50, c:["#a78bfa","#6366f1","#22c55e","#eab308","#ef4444"], tipos:["invernadero","casa_malla"]}
+};
+var SLOT_BASE = {
+  1:{temp_aire:21,hum_aire:79,co2_ppm:472,hum_sustrato:71,ce_sustrato:2.1,radiacion_par:60,ch4_ppm:1.2,etileno_ppm:0.005,radiacion_solar_wm2:70,evaporacion_mm:0.3,campo_mag_ut:32},
+  2:{temp_aire:25,hum_aire:74,co2_ppm:530,hum_sustrato:69,ce_sustrato:2.2,radiacion_par:620,ch4_ppm:1.8,etileno_ppm:0.008,radiacion_solar_wm2:520,evaporacion_mm:1.8,campo_mag_ut:34},
+  3:{temp_aire:30,hum_aire:64,co2_ppm:610,hum_sustrato:65,ce_sustrato:2.4,radiacion_par:1820,ch4_ppm:2.5,etileno_ppm:0.012,radiacion_solar_wm2:880,evaporacion_mm:4.2,campo_mag_ut:38},
+  4:{temp_aire:28,hum_aire:68,co2_ppm:580,hum_sustrato:67,ce_sustrato:2.3,radiacion_par:950,ch4_ppm:2.1,etileno_ppm:0.010,radiacion_solar_wm2:640,evaporacion_mm:3.1,campo_mag_ut:36},
+  5:{temp_aire:23,hum_aire:76,co2_ppm:495,hum_sustrato:70,ce_sustrato:2.2,radiacion_par:290,ch4_ppm:1.5,etileno_ppm:0.006,radiacion_solar_wm2:220,evaporacion_mm:1.2,campo_mag_ut:33}
+};
+var Z_FACTOR = {"0":0.88,"1.2":1.0,"2.0":1.06};
+var ALERTS_DATA = [
+  {v:"temp_aire",lv:"critico",pasillo:"6I",z:"1.2m",val:34.8,thr:30,msg:"Temperatura crítica pasillo 6 izquierda z=1.2m",ac:"Activar ventilación forzada sector norte",ok:false},
+  {v:"hum_sustrato",lv:"advertencia",pasillo:"11D",z:"0cm",val:58.2,thr:62,msg:"Déficit hídrico proyectado pasillo 11 derecha",ac:"Revisar sistema de goteo D-11",ok:false},
+  {v:"ch4_ppm",lv:"advertencia",pasillo:"3I-5I",z:"1.2m",val:7.3,thr:5,msg:"Metano elevado pasillos 3-5 izquierda",ac:"Verificar fermentación sustrato",ok:false},
+  {v:"etileno_ppm",lv:"info",pasillo:"8D",z:"1.2m",val:0.028,thr:0.02,msg:"Etileno por encima óptimo pasillo 8 derecha",ac:"Monitorear maduración diferencial",ok:false},
+  {v:"ce_sustrato",lv:"advertencia",pasillo:"14D",z:"0cm",val:3.2,thr:2.6,msg:"CE elevada sustrato fila 14 derecha",ac:"Lavado de sustrato recomendado",ok:true}
+];
+
+// STATE
+var curVk = "temp_aire";
+var curSlot = 3;
+var curTipo = "invernadero";
+var curEstructura = {nombre:"Invernadero 01", filas:7, cols:2, zonas:14, cultivo:"Tomate Cherry", semana:2};
+var medsCache = {};
+var selectedZones = {};
+for(var i=1;i<=19;i++){selectedZones[i+"I"]=true;selectedZones[i+"D"]=true;}
+var robActive=false;
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function rnd(n){return(Math.random()-.5)*2*n;}
+function hexRgb(h){var m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?[parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]:null;}
+function getColor(val,vk,a){
+  a=a||.88;var cfg=VARS[vk];if(!cfg)return"#888";
+  var t=Math.max(0,Math.min(1,(val-cfg.mn)/(cfg.mx-cfg.mn)));
+  var cols=cfg.c,n=cols.length,seg=(n-1)*t,i=Math.min(Math.floor(seg),n-2),f=seg-i;
+  var c1=hexRgb(cols[i]),c2=hexRgb(cols[i+1]);if(!c1||!c2)return"#888";
+  return"rgba("+Math.round(c1[0]+f*(c2[0]-c1[0]))+","+Math.round(c1[1]+f*(c2[1]-c1[1]))+","+Math.round(c1[2]+f*(c2[2]-c1[2]))+","+a+")";
+}
+function idw(pts,gx,gy){var n=0,d=0;for(var i=0;i<pts.length;i++){var dx=gx-pts[i].x,dy=gy-pts[i].y,d2=dx*dx+dy*dy;if(d2<.01)return pts[i].v;var w=1/d2;n+=w*pts[i].v;d+=w;}return d===0?null:n/d;}
+function avg(arr){if(!arr||!arr.length)return 0;return arr.reduce(function(a,b){return a+b;},0)/arr.length;}
+function genMeds(slot,zLevel){
+  var key=slot+"-"+zLevel+"-"+curTipo;
+  if(medsCache[key])return medsCache[key];
+  var base=SLOT_BASE[slot||3],zf=Z_FACTOR[String(zLevel)]||1.0;
+  var filas=curEstructura.filas||7,cols=curEstructura.cols||2;
+  var pts=[];
+  var xPositions=cols===2?[1.8,5.2,16.3,19.7]:[1.8,5.2,10.0,14.5,18.5];
+  // field adjust for campo_abierto
+  var spacingY=curTipo==="campo_abierto"?180:37;
+  var IH=filas*spacingY;
+  for(var r=1;r<=filas;r++){
+    var yc=(r-1)*spacingY+spacingY*0.5,sf=Math.sin((r/filas)*Math.PI);
+    for(var xi=0;xi<xPositions.length;xi++){
+      var p={x:xPositions[xi]+rnd(.4),y:yc+rnd(spacingY*0.1)};
+      for(var vk in VARS){
+        var bv=base[vk]||0;
+        p[vk]=+(bv*zf+sf*3*(vk==="temp_aire"?1:-0.3)+rnd(bv*0.08||1.5)).toFixed(3);
+      }
+      pts.push(p);
+    }
+  }
+  medsCache[key]=pts;return pts;
+}
+function getZoneStats(slot,zLevel){
+  var meds=genMeds(slot,zLevel),stats=[];
+  var filas=curEstructura.filas||7,IW=21.5;
+  var spacingY=curTipo==="campo_abierto"?180:37;
+  for(var r=1;r<=filas;r++){
+    for(var col=0;col<2;col++){
+      var id=r+(col===0?"I":"D");
+      var xMin=col===0?0:14.5,xMax=col===0?7:21.5;
+      var yMin=(r-1)*spacingY,yMax=r*spacingY;
+      var subset=meds.filter(function(m){return m.x>=xMin&&m.x<=xMax&&m.y>=yMin&&m.y<=yMax;});
+      var s={id:id,row:r,col:col===0?"I":"D"};
+      for(var vk in VARS){
+        var vals=subset.map(function(m){return m[vk];}).filter(Boolean);
+        s[vk+"_avg"]=avg(vals);
+        s[vk+"_max"]=vals.length?Math.max.apply(null,vals):0;
+        s[vk+"_min"]=vals.length?Math.min.apply(null,vals):0;
+      }
+      stats.push(s);
+    }
+  }
+  return stats;
+}
+function getVarStatus(val,vk){
+  var cfg=VARS[vk];if(!cfg)return"ok";
+  if(val>cfg.mx||val<cfg.mn)return"crit";
+  if(val>cfg.omx||val<cfg.omn)return"warn";
+  return"ok";
+}
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+function doLogin(){
+  var u=document.getElementById("l-u").value.trim();
+  var p=document.getElementById("l-p").value.trim();
+  if((u==="admin@agrosense.co"||u==="admin")&&p==="agro2026"){
+    document.getElementById("s-login").classList.remove("active");
+    document.getElementById("s-app").classList.add("active");
+    initApp();
+  }else{document.getElementById("l-err").style.display="block";}
+}
+function doLogout(){
+  document.getElementById("s-app").classList.remove("active");
+  document.getElementById("s-login").classList.add("active");
+}
+document.getElementById("l-p").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll(".tab-pane").forEach(function(el){el.classList.remove("active");});
+  document.querySelectorAll(".nav-btn").forEach(function(b){b.classList.remove("active");});
+  document.getElementById(id).classList.add("active");
+  btn.classList.add("active");
+  if(id==="t-mapa")redrawMap();
+  if(id==="t-graf")drawCharts();
+  if(id==="t-alert")buildAlerts();
+  if(id==="t-robot")initRobTab();
+}
+
+// ══════════════════════════════════════════════════════
+// STRUCTURE SELECTORS
+// ══════════════════════════════════════════════════════
+function onClienteChange(){
+  document.getElementById("top-cliente").textContent="Condominio HidroExpo";
+}
+function onTipoChange(){
+  curTipo=document.getElementById("sel-tipo").value;
+  medsCache={};
+  var sel=document.getElementById("sel-estructura");
+  sel.innerHTML="";
+  var counts={invernadero:35,casa_malla:8,campo_abierto:35};
+  var labels={invernadero:"Invernadero",casa_malla:"Casa Malla",campo_abierto:"Hectárea CA-"};
+  var n=counts[curTipo];
+  for(var i=1;i<=n;i++){
+    var opt=document.createElement("option");
+    opt.value=i;opt.textContent=labels[curTipo]+" "+String(i).padStart(2,"0");
+    sel.appendChild(opt);
+  }
+  onEstructuraChange();
+  buildVarRow();
+}
+function onEstructuraChange(){
+  var tipo=curTipo;
+  var i=parseInt(document.getElementById("sel-estructura").value)||1;
+  var cultivos_inv=["Tomate Cherry","Pepino","Lechuga NFT"];
+  var cultivos_cm=["Fresa","Tomate Chonto"];
+  var cultivos_ca=["Papa","Maíz","Arveja","Cebolla"];
+  var cultivoArr=tipo==="invernadero"?cultivos_inv:tipo==="casa_malla"?cultivos_cm:cultivos_ca;
+  curEstructura={
+    nombre:(tipo==="invernadero"?"Invernadero ":tipo==="casa_malla"?"Casa Malla ":"Hectárea CA-")+String(i).padStart(2,"0"),
+    filas:tipo==="campo_abierto"?4:7,
+    cols:2,
+    zonas:tipo==="campo_abierto"?8:14,
+    cultivo:cultivoArr[(i-1)%cultivoArr.length],
+    semana:(i%12)+1
+  };
+  medsCache={};
+  document.getElementById("dash-struct-title").textContent=curEstructura.nombre+" — "+curEstructura.cultivo+" · Sem."+curEstructura.semana;
+  document.getElementById("n-pasillos").textContent=curEstructura.zonas;
+  document.getElementById("n-meds-dia").textContent=(curEstructura.zonas*30*5).toLocaleString();
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════════════
+// VAR ROW
+// ══════════════════════════════════════════════════════
+function buildVarRow(){
+  var el=document.getElementById("var-row");el.innerHTML="";
+  for(var k in VARS){
+    if(VARS[k].tipos.indexOf(curTipo)<0)continue;
+    (function(vk){
+      var cfg=VARS[vk];
+      var meds=genMeds(curSlot,"1.2");
+      var vals=meds.map(function(m){return m[vk];}).filter(Boolean);
+      var av=avg(vals);
+      var status=getVarStatus(av,vk);
+      var btn=document.createElement("button");
+      btn.className="vchip"+(vk===curVk?" active":"");
+      btn.id="vchip-"+vk;
+      btn.innerHTML=cfg.ic+" <span style='font-size:9px'>"+cfg.l+"</span><span style='font-family:var(--font-mono);font-size:10px;font-weight:700;color:"+(status==="crit"?"var(--red)":status==="warn"?"var(--amber)":"var(--green)")+"'>"+av.toFixed(av<1?3:1)+cfg.u+"</span>";
+      btn.onclick=function(){setVk(vk);};
+      el.appendChild(btn);
+    })(k);
+  }
+}
+function setVk(k){
+  curVk=k;
+  document.querySelectorAll(".vchip").forEach(function(b){b.classList.remove("active");});
+  var ch=document.getElementById("vchip-"+k);if(ch)ch.classList.add("active");
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════════════
+// KPIs
+// ══════════════════════════════════════════════════════
+function buildKPIs(){
+  var el=document.getElementById("kpi-row");if(!el)return;
+  var meds=genMeds(curSlot,"1.2");
+  function getAvg(vk){return avg(meds.map(function(m){return m[vk]||0;}));}
+  var kpis=[
+    {l:"Temp",v:getAvg("temp_aire").toFixed(1)+"°C",c:"#f97316",ic:"🌡",vk:"temp_aire"},
+    {l:"Humedad",v:getAvg("hum_aire").toFixed(0)+"%",c:"#0ea5e9",ic:"💧",vk:"hum_aire"},
+    {l:"CO₂",v:getAvg("co2_ppm").toFixed(0)+"ppm",c:"#22c55e",ic:"🌬",vk:"co2_ppm"},
+    {l:"Metano",v:getAvg("ch4_ppm").toFixed(1)+"ppm",c:"#f59e0b",ic:"🔥",vk:"ch4_ppm"},
+    {l:"Alertas",v:"4",c:"#ef4444",ic:"⚠",vk:null},
+    {l:"Zonas",v:curEstructura.zonas+"",c:"#4ade80",ic:"📍",vk:null}
+  ];
+  el.innerHTML="";
+  kpis.forEach(function(k){
+    var status=k.vk?getVarStatus(parseFloat(k.v),k.vk):"ok";
+    var d=document.createElement("div");
+    d.style.cssText="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 10px;border-top:2px solid "+k.c+";cursor:"+(k.vk?"pointer":"default");
+    d.innerHTML='<div style="font-size:12px">'+k.ic+'</div><div class="label" style="margin:2px 0">'+k.l+'</div><div class="val" style="font-size:15px;color:'+k.c+'">'+k.v+'</div>'+(status!=="ok"?'<div style="font-size:8px;color:'+(status==="crit"?"var(--red)":"var(--amber)")+'">'+( status==="crit"?"⚠ CRÍTICO":"⚡ ALERTA")+'</div>':'');
+    if(k.vk)d.onclick=function(){setVk(k.vk);};
+    el.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// LAST MEDS
+// ══════════════════════════════════════════════════════
+function buildLastMeds(){
+  var el=document.getElementById("last-meds");if(!el)return;
+  el.innerHTML="";
+  var vars=["temp_aire","hum_aire","co2_ppm","ch4_ppm","radiacion_solar_wm2"];
+  var meds=genMeds(curSlot,"1.2");
+  vars.forEach(function(vk,idx){
+    if(!VARS[vk])return;
+    var cfg=VARS[vk];
+    var val=meds[idx*3]?meds[idx*3][vk]:cfg.omn;
+    var status=getVarStatus(val,vk);
+    var d=document.createElement("div");
+    d.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg);border-radius:7px;border-left:2px solid "+(status==="crit"?"var(--red)":status==="warn"?"var(--amber)":"var(--border)");
+    d.innerHTML='<div style="display:flex;align-items:center;gap:8px"><span>'+cfg.ic+'</span><div><div style="font-size:10px;color:var(--text)">'+cfg.l+' · Zona '+(idx+1)+'I</div><div style="font-size:9px;color:var(--text2);font-family:var(--font-mono)">IoT Fijo · 12:'+String(30-idx*2).padStart(2,'0')+' PM</div></div></div><div style="text-align:right"><div class="val" style="font-size:12px;color:'+(status==="crit"?"var(--red)":status==="warn"?"var(--amber)":"var(--green2)")+'">'+val.toFixed(val<1?3:1)+' '+cfg.u+'</div><div style="font-size:8px;color:var(--text3)">Ópt: '+cfg.omn+'–'+cfg.omx+'</div></div>';
+    el.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// INV CANVAS
+// ══════════════════════════════════════════════════════
+function drawInvCanvas(){
+  var c=document.getElementById("inv-canvas");if(!c)return;
+  var W=c.parentElement.clientWidth-28||300;c.width=W;c.height=190;
+  var ctx=c.getContext("2d");
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,190);
+  var meds=genMeds(curSlot,"1.2");
+  var filas=curEstructura.filas||7;
+  var topH=18,botH=165,modH=botH/filas;
+  // Labels
+  ctx.fillStyle="#22c55e";ctx.font="bold 8px monospace";ctx.textAlign="center";
+  ctx.fillText("IZQUIERDA",W*0.22,13);
+  ctx.fillText("PASILLO",W*0.5,13);
+  ctx.fillText("DERECHA",W*0.78,13);
+  // Pasillo
+  ctx.fillStyle="#081208";ctx.fillRect(W*0.43,topH,W*0.14,botH);
+  ctx.fillStyle="#0f200f";ctx.font="7px monospace";ctx.textAlign="center";
+  ctx.save();ctx.translate(W*0.5,topH+botH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText(curEstructura.nombre,0,0);ctx.restore();
+  // Modules
+  for(var r=0;r<filas;r++){
+    var yO=topH+r*modH;
+    for(var col=0;col<2;col++){
+      var xO=col===0?0:W*0.57,mW=W*0.42;
+      var cx2=col===0?3.5:18,cy2=r*37+18;
+      var pts=meds.map(function(m){return{x:m.x,y:m.y,v:m[curVk]||0};});
+      var v=idw(pts,cx2,cy2);
+      ctx.fillStyle=v!=null?getColor(v,curVk,.92):"#0f200f";
+      ctx.fillRect(xO+1,yO+1,mW-2,modH-2);
+      ctx.strokeStyle="rgba(34,197,94,.12)";ctx.lineWidth=.5;
+      ctx.strokeRect(xO+1,yO+1,mW-2,modH-2);
+      // status dot
+      if(v!=null){
+        var st=getVarStatus(v,curVk);
+        if(st!=="ok"){ctx.fillStyle=st==="crit"?"#ef4444":"#f59e0b";ctx.beginPath();ctx.arc(xO+mW-5,yO+5,2.5,0,Math.PI*2);ctx.fill();}
+      }
+      ctx.fillStyle="rgba(255,255,255,.65)";ctx.font="6px monospace";ctx.textAlign="left";
+      ctx.fillText((r+1)+(col===0?"I":"D"),xO+3,yO+modH*0.7);
+    }
+  }
+  // Sensor dots
+  meds.forEach(function(p){
+    ctx.beginPath();ctx.arc(p.x*(W/21.5),p.y*(botH/(filas*37))+topH,2,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,.8)";ctx.fill();
+  });
+  c.onclick=function(e){
+    var rect=c.getBoundingClientRect();
+    var mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    var row=Math.floor((my-topH)/modH)+1;
+    if(row<1||row>filas)return;
+    var col=mx<W*0.43?"I":mx>W*0.57?"D":null;if(!col)return;
+    document.getElementById("sel-zone").textContent="📍 Zona "+row+col;
+    showTab("t-graf",document.querySelector('.nav-btn:nth-child(3)'));
+  };
+}
+
+// ══════════════════════════════════════════════════════
+// HEATMAP
+// ══════════════════════════════════════════════════════
+function redrawMap(){
+  var vk=curVk,slot=parseInt(document.getElementById("map-slot").value);
+  var z=document.getElementById("map-z").value;
+  var meds=genMeds(slot,z);
+  var c=document.getElementById("hmap");if(!c)return;
+  var W=c.parentElement.clientWidth-28||300;
+  var filas=curEstructura.filas||7;
+  var spacingY=curTipo==="campo_abierto"?180:37;
+  var IH=filas*spacingY;
+  var H=Math.round(W*2.0);
+  c.width=W;c.height=H;
+  var ctx=c.getContext("2d");
+  var IW=21.5,sx=W/IW,sy=H/IH;
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#081408";ctx.fillRect(7*sx,0,7.5*sx,H);
+  ctx.save();ctx.translate(7*sx+3.75*sx,H/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle="#0f200f";ctx.font="8px monospace";ctx.textAlign="center";
+  ctx.fillText("PASILLO",0,0);ctx.restore();
+  var pts=meds.map(function(m){return{x:m.x,y:m.y,v:m[vk]||0};});
+  var GR=48;
+  [{x0:0,x1:7},{x0:14.5,x1:21.5}].forEach(function(z2){
+    for(var gx=0;gx<GR;gx++)for(var gy=0;gy<GR;gy++){
+      var wx=z2.x0+(gx/GR)*(z2.x1-z2.x0),wy=(gy/GR)*IH;
+      var v=idw(pts,wx,wy);if(v==null)continue;
+      ctx.fillStyle=getColor(v,vk,.88);
+      ctx.fillRect(wx*sx,wy*sy,((z2.x1-z2.x0)/GR)*sx+1,(IH/GR)*sy+1);
+    }
+  });
+  ctx.strokeStyle="rgba(34,197,94,.15)";ctx.lineWidth=.5;
+  ctx.fillStyle="rgba(255,255,255,.55)";ctx.font="6px monospace";
+  for(var r=1;r<=filas;r++){
+    [{xo:0},{xo:14.5}].forEach(function(col,ci){
+      var x=col.xo*sx,y=(r-1)*spacingY*sy,w=7*sx,h=spacingY*sy*0.97;
+      ctx.strokeRect(x,y,w,h);
+      ctx.fillText(r+(ci===0?"I":"D"),x+2,y+9);
+    });
+  }
+  pts.forEach(function(p){
+    ctx.beginPath();ctx.arc(p.x*sx,p.y*sy*spacingY/37,2,0,Math.PI*2);
+    ctx.fillStyle="rgba(255,255,255,.85)";ctx.fill();
+  });
+  // Draw threshold lines on legend
+  var cfg=VARS[vk];
+  document.getElementById("leg-min").textContent=cfg.mn+cfg.u+" (min)";
+  document.getElementById("leg-max").textContent=cfg.mx+cfg.u+" (max)";
+  var lc=document.getElementById("leg-c");
+  if(lc){lc.width=W-80;lc.height=8;var lctx=lc.getContext("2d");
+    for(var i=0;i<60;i++){var vv=cfg.mn+(i/59)*(cfg.mx-cfg.mn);lctx.fillStyle=getColor(vv,vk,1);lctx.fillRect(i*((W-80)/60),0,(W-80)/60+1,8);}
+    // Optimal zone markers
+    var optMinPct=(cfg.omn-cfg.mn)/(cfg.mx-cfg.mn);
+    var optMaxPct=(cfg.omx-cfg.mn)/(cfg.mx-cfg.mn);
+    lctx.fillStyle="rgba(255,255,255,.35)";
+    lctx.fillRect(optMinPct*(W-80),0,(optMaxPct-optMinPct)*(W-80),8);
+    lctx.fillStyle="white";
+    lctx.fillRect(optMinPct*(W-80)-1,0,2,8);
+    lctx.fillRect(optMaxPct*(W-80)-1,0,2,8);
+  }
+  var tit=document.getElementById("map-title");
+  var sl=["06AM","09AM","12PM","03PM","06PM"][slot-1];
+  if(tit)tit.textContent=cfg.ic+" "+cfg.l+" · IDW · "+sl+" · z="+z+"m";
+  buildZoneBars(vk,slot,z);
+}
+
+function buildZoneBars(vk,slot,z){
+  var el=document.getElementById("zone-bars");if(!el)return;
+  el.innerHTML="";
+  var stats=getZoneStats(slot,z),cfg=VARS[vk];
+  stats.slice(0,16).forEach(function(s){
+    var v=s[vk+"_avg"],mn=s[vk+"_min"],mx=s[vk+"_max"];
+    var pct=Math.max(0,Math.min(100,((v-cfg.mn)/(cfg.mx-cfg.mn))*100));
+    var status=getVarStatus(v,vk);
+    var d=document.createElement("div");
+    d.style.cssText="display:flex;align-items:center;gap:5px;margin-bottom:3px";
+    d.innerHTML='<span style="font-size:8px;color:var(--text2);min-width:22px;font-family:var(--font-mono)">'+s.id+'</span>'+
+      '<div style="flex:1;position:relative"><div class="thr-bar"><div class="thr-optimal" style="left:'+((cfg.omn-cfg.mn)/(cfg.mx-cfg.mn)*100)+'%;width:'+((cfg.omx-cfg.omn)/(cfg.mx-cfg.mn)*100)+'%"></div><div class="thr-current" style="left:'+pct+'%;background:'+(status==="crit"?"var(--red)":status==="warn"?"var(--amber)":"var(--green)")+'"></div></div></div>'+
+      '<div style="font-size:8px;min-width:52px;text-align:right;font-family:var(--font-mono)"><span style="color:var(--red)">'+(mx.toFixed(mx<1?3:1))+'</span><span style="color:var(--text3)">·</span><span style="color:var(--green)">'+(v.toFixed(v<1?3:1))+'</span><span style="color:var(--text3)">·</span><span style="color:var(--blue)">'+(mn.toFixed(mn<1?3:1))+'</span></div>';
+    el.appendChild(d);
+  });
+  // Legend
+  var leg=document.createElement("div");
+  leg.style.cssText="margin-top:4px;display:flex;gap:8px";
+  leg.innerHTML='<span style="font-size:8px;color:var(--red)">■ Máx</span><span style="font-size:8px;color:var(--green)">■ Prom</span><span style="font-size:8px;color:var(--blue)">■ Mín</span><span style="font-size:8px;color:var(--text3)">| Zona óptima</span>';
+  el.appendChild(leg);
+}
+
+// ══════════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════════
+function drawCharts(){
+  var vk=curVk,cfg=VARS[vk];
+  buildGrStats(vk,cfg);
+  drawChartDay(vk,cfg);
+  drawChartZ(vk,cfg);
+  drawChartMMM(vk,cfg);
+  buildStatsTable(vk,cfg);
+}
+
+function buildGrStats(vk,cfg){
+  var el=document.getElementById("gr-stats");if(!el)return;
+  var meds=genMeds(curSlot,"1.2");
+  var vals=meds.map(function(m){return m[vk]||0;});
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),av=avg(vals);
+  el.innerHTML=[
+    ['Mín','#3b82f6',mn],['Prom','#22c55e',av],['Máx','#ef4444',mx],
+    ['Ópt min','#6b7280',cfg.omn],['Ópt max','#6b7280',cfg.omx]
+  ].map(function(x){
+    var v=typeof x[2]==="number"?x[2].toFixed(x[2]<1?3:1):x[2];
+    return'<div style="text-align:center"><div style="font-size:8px;color:'+x[1]+'">'+x[0]+'</div><div style="font-size:10px;font-weight:700;color:'+x[1]+';font-family:var(--font-mono)">'+v+'</div></div>';
+  }).join("");
+}
+
+function drawChartDay(vk,cfg){
+  var c=document.getElementById("chart-day");if(!c)return;
+  var W=c.parentElement.clientWidth-24||300;c.width=W;c.height=170;
+  var ctx=c.getContext("2d");
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,170);
+  var pad={l:44,r:12,t:14,b:28};
+  var cW=W-pad.l-pad.r,cH=170-pad.t-pad.b;
+  // Grid + optimal band
+  ctx.strokeStyle="#0f200f";ctx.lineWidth=.5;
+  for(var i=0;i<=4;i++){var y=pad.t+i*(cH/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+    var v=cfg.mx-(i/4)*(cfg.mx-cfg.mn);
+    ctx.fillStyle="#4b6455";ctx.font="8px monospace";ctx.textAlign="right";ctx.fillText(v.toFixed(v<1?2:0),pad.l-3,y+3);
+  }
+  // Optimal band
+  var y1=pad.t+((cfg.mx-cfg.omx)/(cfg.mx-cfg.mn))*cH;
+  var y2=pad.t+((cfg.mx-cfg.omn)/(cfg.mx-cfg.mn))*cH;
+  ctx.fillStyle="rgba(34,197,94,.07)";ctx.fillRect(pad.l,y1,cW,y2-y1);
+  ctx.strokeStyle="rgba(34,197,94,.25)";ctx.lineWidth=.7;ctx.setLineDash([3,3]);
+  ctx.strokeRect(pad.l,y1,cW,y2-y1);ctx.setLineDash([]);
+  // Min/Max threshold lines
+  var yMin=pad.t+((cfg.mx-cfg.mn)/(cfg.mx-cfg.mn))*cH;
+  var yMax=pad.t+((cfg.mx-cfg.mx)/(cfg.mx-cfg.mn))*cH;
+  ctx.strokeStyle="rgba(239,68,68,.4)";ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l+cW,pad.t);ctx.stroke();
+  ctx.strokeStyle="rgba(59,130,246,.4)";
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t+cH);ctx.lineTo(pad.l+cW,pad.t+cH);ctx.stroke();
+  ctx.setLineDash([]);
+  // Labels
+  ctx.fillStyle="#ef4444";ctx.font="7px monospace";ctx.textAlign="left";
+  ctx.fillText("MAX:"+cfg.mx,pad.l+2,pad.t+8);
+  ctx.fillStyle="#3b82f6";
+  ctx.fillText("MIN:"+cfg.mn,pad.l+2,pad.t+cH-2);
+  // Data lines
+  var slots=[1,2,3,4,5];
+  var avgPts=[],minPts=[],maxPts=[];
+  slots.forEach(function(sl){
+    var meds=genMeds(sl,"1.2"),vals=meds.map(function(m){return m[vk]||0;});
+    avgPts.push(avg(vals));
+    minPts.push(Math.min.apply(null,vals));
+    maxPts.push(Math.max.apply(null,vals));
+  });
+  // Band fill
+  ctx.beginPath();
+  slots.forEach(function(sl,i){var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-maxPts[i])/(cfg.mx-cfg.mn))*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  for(var i=slots.length-1;i>=0;i--){var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-minPts[i])/(cfg.mx-cfg.mn))*cH;ctx.lineTo(x,y);}
+  ctx.closePath();ctx.fillStyle="rgba(74,222,128,.06)";ctx.fill();
+  // Max line
+  ctx.strokeStyle="#ef444466";ctx.lineWidth=1;ctx.setLineDash([2,3]);ctx.beginPath();
+  slots.forEach(function(sl,i){var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-maxPts[i])/(cfg.mx-cfg.mn))*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+  // Min line
+  ctx.strokeStyle="#3b82f666";ctx.beginPath();
+  slots.forEach(function(sl,i){var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-minPts[i])/(cfg.mx-cfg.mn))*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+  ctx.setLineDash([]);
+  // Avg line
+  ctx.strokeStyle="#22c55e";ctx.lineWidth=2.5;ctx.beginPath();
+  slots.forEach(function(sl,i){var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-avgPts[i])/(cfg.mx-cfg.mn))*cH;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();
+  // Dots + values
+  avgPts.forEach(function(v,i){
+    var x=pad.l+i*(cW/4),y=pad.t+((cfg.mx-v)/(cfg.mx-cfg.mn))*cH;
+    var st=getVarStatus(v,vk);
+    var col=st==="crit"?"#ef4444":st==="warn"?"#f59e0b":"#22c55e";
+    ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+    ctx.strokeStyle="#050f06";ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle="#e2f5e6";ctx.font="bold 8px monospace";ctx.textAlign="center";
+    ctx.fillText(v.toFixed(v<1?3:1),x,y-9);
+  });
+  // X axis
+  ctx.fillStyle="#4b6455";ctx.font="8px monospace";ctx.textAlign="center";
+  ["06AM","09AM","12PM","03PM","06PM"].forEach(function(l,i){ctx.fillText(l,pad.l+i*(cW/4),170-6);});
+  // Legend
+  var legEl=document.getElementById("chart-day-legend");
+  if(legEl)legEl.innerHTML='<span style="font-size:9px;color:#22c55e">■ Promedio</span><span style="font-size:9px;color:#ef4444">- - Máximo registrado</span><span style="font-size:9px;color:#3b82f6">- - Mínimo registrado</span><span style="font-size:9px;color:#22c55e;opacity:.4">▓ Zona óptima</span>';
+}
+
+function drawChartZ(vk,cfg){
+  var c=document.getElementById("chart-z");if(!c)return;
+  var W=c.parentElement.clientWidth-24||300;c.width=W;c.height=150;
+  var ctx=c.getContext("2d");
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,150);
+  var pad={l:44,r:12,t:12,b:28};
+  var cW=W-pad.l-pad.r,cH=150-pad.t-pad.b;
+  ctx.strokeStyle="#0f200f";ctx.lineWidth=.5;
+  for(var i=0;i<=4;i++){var y=pad.t+i*(cH/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+    var v=cfg.mx-(i/4)*(cfg.mx-cfg.mn);ctx.fillStyle="#4b6455";ctx.font="8px monospace";ctx.textAlign="right";ctx.fillText(v.toFixed(v<1?2:0),pad.l-3,y+3);}
+  var zLevels=["0","1.2","2.0"],colors=["#22c55e","#f59e0b","#3b82f6"];
+  var slots=[1,2,3,4,5];
+  zLevels.forEach(function(z,zi){
+    ctx.strokeStyle=colors[zi];ctx.lineWidth=2;ctx.beginPath();
+    slots.forEach(function(sl,si){
+      var meds=genMeds(sl,z),vals=meds.map(function(m){return m[vk]||0;}),a=avg(vals);
+      var x=pad.l+(si/4)*cW,y=pad.t+((cfg.mx-a)/(cfg.mx-cfg.mn))*cH;
+      si===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });ctx.stroke();
+    slots.forEach(function(sl,si){
+      var meds=genMeds(sl,z),vals=meds.map(function(m){return m[vk]||0;}),a=avg(vals);
+      var x=pad.l+(si/4)*cW,y=pad.t+((cfg.mx-a)/(cfg.mx-cfg.mn))*cH;
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=colors[zi];ctx.fill();
+    });
+  });
+  ctx.fillStyle="#4b6455";ctx.font="8px monospace";ctx.textAlign="center";
+  ["06AM","09AM","12PM","03PM","06PM"].forEach(function(l,i){ctx.fillText(l,pad.l+i*(cW/4),150-6);});
+}
+
+function drawChartMMM(vk,cfg){
+  var c=document.getElementById("chart-mmm");if(!c)return;
+  var W=c.parentElement.clientWidth-24||300;c.width=W;c.height=160;
+  var ctx=c.getContext("2d");
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,160);
+  var stats=getZoneStats(curSlot,"1.2");
+  var pad={l:38,r:8,t:14,b:22},cW=W-pad.l-pad.r,cH=160-pad.t-pad.b;
+  var n=stats.length,bw=Math.max(2,(cW/n)-1.5);
+  ctx.strokeStyle="#0f200f";ctx.lineWidth=.5;
+  for(var i=0;i<=3;i++){var y=pad.t+i*(cH/3);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    var v=cfg.mx-(i/3)*(cfg.mx-cfg.mn);ctx.fillStyle="#4b6455";ctx.font="7px monospace";ctx.textAlign="right";ctx.fillText(v.toFixed(v<1?2:0),pad.l-2,y+3);}
+  // Optimal band line
+  var yOmn=pad.t+((cfg.mx-cfg.omn)/(cfg.mx-cfg.mn))*cH;
+  var yOmx=pad.t+((cfg.mx-cfg.omx)/(cfg.mx-cfg.mn))*cH;
+  ctx.fillStyle="rgba(34,197,94,.06)";ctx.fillRect(pad.l,yOmx,cW,yOmn-yOmx);
+  stats.forEach(function(s,i){
+    var x=pad.l+i*(cW/n)+1,av=s[vk+"_avg"],mx=s[vk+"_max"],mn=s[vk+"_min"];
+    var yAvg=pad.t+((cfg.mx-av)/(cfg.mx-cfg.mn))*cH;
+    var yMx=pad.t+((cfg.mx-mx)/(cfg.mx-cfg.mn))*cH;
+    var yMn=pad.t+((cfg.mx-mn)/(cfg.mx-cfg.mn))*cH;
+    var st=getVarStatus(av,vk);
+    // Bar
+    ctx.fillStyle=getColor(av,vk,.85);
+    ctx.fillRect(x,yAvg,bw,cH-(yAvg-pad.t));
+    // Range line
+    ctx.strokeStyle="rgba(255,255,255,.18)";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x+bw/2,yMx);ctx.lineTo(x+bw/2,yMn);ctx.stroke();
+    // Max dot
+    ctx.beginPath();ctx.arc(x+bw/2,yMx,2,0,Math.PI*2);ctx.fillStyle="#ef4444";ctx.fill();
+    // Min dot
+    ctx.beginPath();ctx.arc(x+bw/2,yMn,2,0,Math.PI*2);ctx.fillStyle="#3b82f6";ctx.fill();
+    if(st==="crit"){ctx.fillStyle="#ef444455";ctx.fillRect(x,pad.t,bw,cH);}
+    if(i%3===0){ctx.fillStyle="#4b6455";ctx.font="6px monospace";ctx.textAlign="center";ctx.fillText(s.id,x+bw/2,160-5);}
+  });
+}
+
+function buildStatsTable(vk,cfg){
+  var el=document.getElementById("stats-table");if(!el)return;
+  var stats=getZoneStats(curSlot,"1.2");
+  var html='<table style="width:100%;border-collapse:collapse;font-size:9px;font-family:var(--font-mono)">';
+  html+='<tr style="background:#0f220f"><th style="padding:5px;text-align:left;color:var(--green)">Zona</th><th style="padding:5px;color:#ef4444">Máx</th><th style="padding:5px;color:#22c55e">Prom</th><th style="padding:5px;color:#3b82f6">Mín</th><th style="padding:5px;color:#f59e0b">Ópt</th><th style="padding:5px;color:#9ca3af">Estado</th></tr>';
+  stats.forEach(function(s){
+    var av=s[vk+"_avg"],mx=s[vk+"_max"],mn=s[vk+"_min"];
+    var st=getVarStatus(av,vk);
+    var sc=st==="crit"?"#ef4444":st==="warn"?"#f59e0b":"#22c55e";
+    var inOpt=av>=cfg.omn&&av<=cfg.omx;
+    html+='<tr style="border-bottom:1px solid #081208">'+
+      '<td style="padding:4px 5px;color:var(--text)">'+s.id+'</td>'+
+      '<td style="padding:4px 5px;text-align:center;color:#ef4444">'+mx.toFixed(mx<1?3:1)+'</td>'+
+      '<td style="padding:4px 5px;text-align:center;color:#22c55e">'+av.toFixed(av<1?3:1)+'</td>'+
+      '<td style="padding:4px 5px;text-align:center;color:#3b82f6">'+mn.toFixed(mn<1?3:1)+'</td>'+
+      '<td style="padding:4px 5px;text-align:center;font-size:8px;color:'+(inOpt?"#22c55e":"#f59e0b")+'">'+(inOpt?"✓":cfg.omn+"–"+cfg.omx)+'</td>'+
+      '<td style="padding:4px 5px;text-align:center"><span class="badge badge-'+(st==="crit"?"crit":st==="warn"?"warn":"ok")+'">'+( st==="crit"?"CRÍTICO":st==="warn"?"ALERTA":"OK")+'</span></td>'+
+    '</tr>';
+  });
+  html+='<tr style="background:#0f220f"><td colspan="6" style="padding:5px;font-size:8px;color:#4b6455">Óptimo: '+cfg.omn+'–'+cfg.omx+' '+cfg.u+' · Rango: '+cfg.mn+'–'+cfg.mx+' '+cfg.u+'</td></tr>';
+  html+='</table>';
+  el.innerHTML=html;
+  var sel=document.getElementById("gr-zona");
+  if(sel&&sel.options.length<3){
+    stats.forEach(function(s){var opt=document.createElement("option");opt.value=s.id;opt.textContent="Zona "+s.id;sel.appendChild(opt);});
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ROBOT
+// ══════════════════════════════════════════════════════
+function robStep2(){
+  var v=document.getElementById("rob-prod").value;
+  document.getElementById("rob-s2").style.opacity=v?"1":".4";
+  if(!v)return;
+  var sel=document.getElementById("rob-struct");sel.innerHTML='<option value="">-- Seleccione --</option>';
+  var tipo=curTipo,n=tipo==="invernadero"?35:tipo==="casa_malla"?8:35;
+  var label=tipo==="invernadero"?"Invernadero ":tipo==="casa_malla"?"Casa Malla ":"Hectárea CA-";
+  for(var i=1;i<=n;i++){sel.innerHTML+='<option value="'+i+'">'+label+String(i).padStart(2,"0")+'</option>';}
+  sel.onchange=function(){
+    document.getElementById("rob-s3").style.opacity="1";
+    document.getElementById("rob-s4").style.opacity="1";
+    buildRobCanvas();updateRobSummary();
+  };
+}
+function initRobTab(){buildRobCanvas();updateRobSummary();}
+function buildRobCanvas(){
+  var c=document.getElementById("rob-canvas");if(!c)return;
+  var W=c.parentElement.clientWidth-28||300;c.width=W;c.height=130;
+  var ctx=c.getContext("2d");
+  ctx.fillStyle="#050f06";ctx.fillRect(0,0,W,130);
+  var filas=curEstructura.filas||7,modW=(W*0.43)/filas,modH=50,topY=10;
+  ctx.fillStyle="#22c55e";ctx.font="7px monospace";ctx.textAlign="center";
+  ctx.fillText("IZQUIERDA",W*0.2,8);ctx.fillText("DERECHA",W*0.77,8);
+  ctx.fillStyle="#081208";ctx.fillRect(W*0.43,topY,W*0.14,modH+10);
+  ctx.fillStyle="#0f200f";ctx.fillText("PASILLO",W*0.5,topY+modH/2+5);
+  for(var r=0;r<filas;r++){
+    for(var col=0;col<2;col++){
+      var id=(r+1)+(col===0?"I":"D");
+      var xO=col===0?r*modW:(W*0.57+r*modW);
+      var active=selectedZones[id]!==false;
+      ctx.fillStyle=active?"#0f2d0f":"#080f08";
+      ctx.fillRect(xO,topY,modW-1,modH);
+      ctx.strokeStyle=active?"#22c55e":"#0f200f";ctx.lineWidth=.5;
+      ctx.strokeRect(xO,topY,modW-1,modH);
+      ctx.fillStyle=active?"#4ade80":"#374151";ctx.font="6px monospace";ctx.textAlign="center";
+      ctx.fillText(r+1,xO+modW/2,topY+modH/2+2);
+    }
+  }
+  c.onclick=function(e){
+    var rect=c.getBoundingClientRect(),scaleX=W/rect.width;
+    var mx=(e.clientX-rect.left)*scaleX;
+    var col=mx<W*0.43?0:mx>W*0.57?1:-1;if(col<0)return;
+    var xBase=col===0?0:W*0.57,r=Math.floor((mx-xBase)/modW);
+    if(r<0||r>=filas)return;
+    var id=(r+1)+(col===0?"I":"D");
+    selectedZones[id]=!selectedZones[id];
+    buildRobCanvas();updateRobSummary();
+  };
+}
+function updateRobSummary(){
+  var el=document.getElementById("rob-summary");if(!el)return;
+  var active=Object.keys(selectedZones).filter(function(k){return selectedZones[k];});
+  var z=document.getElementById("rob-z")?document.getElementById("rob-z").value:"1.2";
+  var pts=z==="all"?active.length*30:active.length*10;
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">'+
+    [["Zonas",active.length+"/"+curEstructura.zonas],["Puntos",pts],["Alt Z",z==="all"?"3 pasadas":z+"m"],["Estructura",curEstructura.nombre]].map(function(x){
+      return'<div><span style="color:var(--text2)">'+x[0]+': </span><b style="color:var(--green2);font-family:var(--font-mono)">'+x[1]+'</b></div>';
+    }).join("")+'</div>';
+}
+function startRobot(){
+  if(robActive)return;robActive=true;
+  var prog=document.getElementById("rob-prog");prog.style.display="block";
+  var active=Object.keys(selectedZones).filter(function(k){return selectedZones[k];});
+  var total=active.length,done=0;
+  var liveEl=document.getElementById("rob-live");
+  function step(){
+    if(done>=total){
+      document.getElementById("rob-lbl").textContent="✅ Recorrido completado";
+      document.getElementById("rob-pct").textContent="100%";
+      document.getElementById("rob-bar").style.width="100%";
+      robActive=false;medsCache={};return;
+    }
+    var zone=active[done],pct=Math.round((done/total)*100);
+    document.getElementById("rob-lbl").textContent="📍 Midiendo zona "+zone+"...";
+    document.getElementById("rob-pct").textContent=pct+"%";
+    document.getElementById("rob-bar").style.width=pct+"%";
+    var d=document.createElement("div");
+    d.style.cssText="font-size:9px;color:var(--green);padding:3px 8px;background:#0f2d0f;border-radius:4px;font-family:var(--font-mono)";
+    var t=SLOT_BASE[curSlot];
+    d.textContent="Z "+zone+" · T:"+(t.temp_aire+rnd(2)).toFixed(1)+"°C · H:"+(t.hum_aire+rnd(3)).toFixed(0)+"% · CH₄:"+(t.ch4_ppm+rnd(1)).toFixed(1)+"ppm · Evap:"+(t.evaporacion_mm+rnd(0.5)).toFixed(1)+"mm/h";
+    liveEl.insertBefore(d,liveEl.firstChild);
+    if(liveEl.children.length>4)liveEl.removeChild(liveEl.lastChild);
+    done++;
+    setTimeout(step,180);
+  }
+  step();
+}
+
+// ══════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════
+function buildAlerts(){
+  var el=document.getElementById("alert-list");if(!el)return;
+  el.innerHTML="";
+  var lc={critico:"#ef4444",advertencia:"#f59e0b",info:"#3b82f6"};
+  var count=ALERTS_DATA.filter(function(a){return!a.ok;}).length;
+  var ac=document.getElementById("alert-count");
+  if(ac){ac.style.display="block";ac.textContent="⚠ "+count;}
+  ALERTS_DATA.forEach(function(a){
+    var c=lc[a.lv]||"#22c55e",cfg=VARS[a.v];
+    var d=document.createElement("div");
+    d.style.cssText="background:"+(a.ok?"var(--bg2)":c+"0d")+";border:1px solid "+(a.ok?"var(--border)":c+"35")+";border-left:3px solid "+(a.ok?"var(--border)":c)+";border-radius:10px;padding:11px 13px;opacity:"+(a.ok?.5:1);
+    d.innerHTML=
+      '<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap">'+
+        '<span class="badge badge-'+(a.lv==="critico"?"crit":a.lv==="advertencia"?"warn":"info")+'">'+a.lv.toUpperCase()+'</span>'+
+        '<span style="font-size:10px;color:var(--text2)">'+cfg.ic+' '+cfg.l+'</span>'+
+        '<span style="font-size:9px;color:#3b82f6;font-family:var(--font-mono)">📍 '+a.pasillo+' z='+a.z+'</span>'+
+        (a.ok?'<span style="font-size:9px;color:#22c55e">✓ Resuelta</span>':'')+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--text);margin-bottom:4px;font-weight:500">'+a.msg+'</div>'+
+      '<div style="font-size:10px;color:var(--green2);margin-bottom:5px">→ '+a.ac+'</div>'+
+      '<div style="font-size:9px;color:var(--text2);font-family:var(--font-mono)">Medido: <b style="color:#fca5a5">'+a.val+' '+cfg.u+'</b> · Umbral óptimo: <b style="color:#fbbf24">'+a.thr+'</b> · Rango: <b style="color:var(--text3)">'+cfg.mn+'–'+cfg.mx+'</b></div>';
+    el.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// AGENT PANEL
+// ══════════════════════════════════════════════════════
+function showAgentPanel(){
+  var panel=document.getElementById("agent-panel");
+  panel.style.display="block";
+  var el=document.getElementById("agent-stats");if(!el)return;
+  var meds=genMeds(curSlot,"1.2");
+  el.innerHTML="";
+  ["temp_aire","hum_aire","co2_ppm","ch4_ppm","etileno_ppm","radiacion_solar_wm2","evaporacion_mm"].forEach(function(vk){
+    if(!VARS[vk])return;
+    var cfg=VARS[vk];
+    var vals=meds.map(function(m){return m[vk]||0;});
+    var av=avg(vals),mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals);
+    var st=getVarStatus(av,vk);
+    var d=document.createElement("div");
+    d.style.cssText="background:var(--bg);border-radius:8px;padding:9px 10px;border-left:2px solid "+(st==="crit"?"var(--red)":st==="warn"?"var(--amber)":"var(--border)");
+    d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:10px;font-weight:600">'+cfg.ic+' '+cfg.l+'</div><div style="font-size:8px;color:var(--text2);font-family:var(--font-mono)">Mín:'+mn.toFixed(mn<1?3:1)+' · Prom:'+av.toFixed(av<1?3:1)+' · Máx:'+mx.toFixed(mx<1?3:1)+' '+cfg.u+'</div></div><span class="badge badge-'+(st==="crit"?"crit":st==="warn"?"warn":"ok")+'" style="font-size:8px">'+( st==="crit"?"CRIT":st==="warn"?"WARN":"OK")+'</span></div>';
+    el.appendChild(d);
+  });
+}
+function hideAgentPanel(){document.getElementById("agent-panel").style.display="none";}
+
+// ══════════════════════════════════════════════════════
+// REFRESH & INIT
+// ══════════════════════════════════════════════════════
+function refreshAll(){
+  buildVarRow();buildKPIs();buildLastMeds();drawInvCanvas();
+  var active=document.querySelector(".tab-pane.active");
+  if(!active)return;
+  if(active.id==="t-mapa")redrawMap();
+  if(active.id==="t-graf")drawCharts();
+  if(active.id==="t-alert")buildAlerts();
+}
+function initApp(){
+  onClienteChange();onTipoChange();
+  buildAlerts();
+  setInterval(function(){if(document.getElementById("ft-time"))document.getElementById("ft-time").textContent=new Date().toLocaleString("es-CO",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});},30000);
+  document.getElementById("ft-time").textContent=new Date().toLocaleString("es-CO",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});
+}
+window.addEventListener("resize",function(){
+  drawInvCanvas();buildRobCanvas();
+  var active=document.querySelector(".tab-pane.active");
+  if(!active)return;
+  if(active.id==="t-mapa")redrawMap();
+  if(active.id==="t-graf")drawCharts();
+});
+</script>
+</body>
+</html>
