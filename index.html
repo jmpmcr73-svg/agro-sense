@@ -514,7 +514,7 @@ function doLogin(){
   var u=document.getElementById("l-u").value.trim(),p=document.getElementById("l-p").value.trim(),ok=false;
   if((u==="admin@agrosense.co"||u==="admin")&&p==="agro2026"){ok=true;uRole="admin";}
   else if(u==="productor@agrosense.co"&&p==="agro2026"){ok=true;uRole="productor";}
-  if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();try{setTimeout(function(){greetVoice(curUserName);},900);loadQuickPrompts();loadSystemStatus();}catch(ex){console.log(ex);}}}
+  if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();setTimeout(function(){try{greetVoice(curUserName);}catch(e){}},900);try{loadQuickPrompts();loadSystemStatus();}catch(e){}}
   else document.getElementById("l-err").style.display="block";
 }
 function doLogout(){document.getElementById("s-app").classList.remove("active");document.getElementById("s-login").classList.add("active");}
