@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>iAIRobots · AGROSENSe Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#f0f4f0;--white:#fff;--card:#fff;--green:#16a34a;--green2:#22c55e;--greenl:#dcfce7;--greenb:#bbf7d0;--blue:#1d4ed8;--bluel:#dbeafe;--blueb:#bfdbfe;--amber:#d97706;--amberl:#fef3c7;--amberb:#fde68a;--red:#dc2626;--redl:#fee2e2;--redb:#fecaca;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--text4:#cbd5e1;--border:#e2e8f0;--shadow:0 1px 3px rgba(0,0,0,.07);--radius:10px;--radius-lg:14px;--font:'Outfit',sans-serif;--mono:'JetBrains Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+button{font-family:var(--font);cursor:pointer}
+input,select,textarea{font-family:var(--font);outline:none;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-size:12px;width:100%;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--green2)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--greenb);border-radius:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.fade{animation:fadeUp .28s ease both}.pdot{animation:pulse 2.2s infinite}
+.screen{display:none}.screen.active{display:flex;flex-direction:column;min-height:100vh}
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow)}
+.card-green{background:#f0fdf4;border-color:var(--greenb)}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.bok{background:var(--greenl);color:#15803d;border:1px solid var(--greenb)}.bwn{background:var(--amberl);color:#92400e;border:1px solid var(--amberb)}.bcr{background:var(--redl);color:#991b1b;border:1px solid var(--redb)}.bin{background:var(--bluel);color:#1e40af;border:1px solid var(--blueb)}.bgr{background:#f1f5f9;color:#475569;border:1px solid var(--border)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btp{background:var(--green);color:#fff}.btp:hover{background:#15803d}.bto{background:#fff;color:var(--green);border:1.5px solid var(--green2)}.bto:hover{background:#f0fdf4}.btr{background:#fff;color:var(--red);border:1.5px solid var(--redb)}.bsm{padding:5px 12px;font-size:11px}.bxs{padding:3px 8px;font-size:10px}
+.sbox{border-radius:8px;padding:8px 9px;cursor:pointer;transition:all .15s;border:1.5px solid var(--border);background:#fff;text-align:center}.sbox.ok{border-color:var(--greenb);background:#f0fdf4}.sbox.warn{border-color:var(--amberb);background:var(--amberl)}.sbox.crit{border-color:var(--redb);background:var(--redl)}
+.topbar{background:#fff;border-bottom:1.5px solid var(--border);padding:7px 13px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.side-panel{position:fixed;right:0;top:0;bottom:0;width:min(310px,94vw);background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:150;transform:translateX(110%);transition:transform .28s ease;overflow-y:auto}.side-panel.open{transform:translateX(0)}
+.pov{position:fixed;inset:0;z-index:149;background:rgba(0,0,0,.2);display:none}.pov.open{display:block}
+.chat-bbl-u{background:#dcfce7;border-radius:12px 12px 4px 12px;padding:8px 12px;font-size:12px;max-width:82%;color:#15803d;word-break:break-word}
+.chat-bbl-a{background:#f8fafc;border-radius:12px 12px 12px 4px;padding:8px 12px;font-size:12px;max-width:85%;border:1px solid var(--border);color:var(--text);word-break:break-word}
+.chat-meta{font-size:9px;color:var(--text3);margin-top:3px;text-align:right}
+.typing-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green2);animation:pulse 1.2s infinite;margin:0 2px}.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+.chat-send-btn{flex-shrink:0;border:none;background:var(--green);color:#fff;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}.chat-send-btn:disabled{opacity:.5;cursor:not-allowed}
+.chat-mic-btn{flex-shrink:0;border:1.5px solid var(--border);background:#fff;padding:7px 10px;border-radius:8px;font-size:13px;cursor:pointer}.chat-mic-btn.active{background:var(--redl);border-color:var(--redb)}
+.stt-status{display:none;font-size:10px;color:var(--green);padding:2px 7px;background:var(--greenl);border-radius:5px;border:1px solid var(--greenb)}.stt-status.vis{display:inline-block}
+.qbtn{font-size:9px;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);white-space:nowrap;transition:all .15s}.qbtn:hover{border-color:var(--green2);background:var(--greenl);color:var(--green)}
+.semaforo{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0}.sem-verde{background:#22c55e}.sem-amarillo{background:#f59e0b}.sem-rojo{background:#ef4444;animation:pulse 1s infinite}
+</style>
+</head>
+<body>
+<div id="s-login" class="screen active" style="background:linear-gradient(135deg,#f0fdf4 0%,#fff 45%,#eff6ff 100%);align-items:center;justify-content:center;padding:24px">
+  <div style="width:100%;max-width:340px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:90px;height:90px;border-radius:20px;margin:0 auto 12px;background:var(--green);box-shadow:0 8px 28px #16a34a28;border:3px solid var(--greenb);display:flex;align-items:center;justify-content:center;font-size:50px">🌱</div>
+      <div style="font-size:26px;font-weight:800;margin-top:6px">iAIRobots</div>
+    </div>
+    <div class="card">
+      <div style="font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:13px;text-align:center">Acceso al Sistema</div>
+      <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:4px">USUARIO</div><input id="l-u" type="text" value="admin@agrosense.co"/></div>
+      <div style="margin-bottom:16px"><div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:4px">CONTRASEÑA</div><input id="l-p" type="password" value="agro2026"/></div>
+      <button onclick="doLogin()" class="btn btp" style="width:100%;padding:11px;font-size:13px">Ingresar →</button>
+      <div id="l-err" style="display:none;font-size:10px;color:var(--red);text-align:center;margin-top:7px">Credenciales incorrectas</div>
+    </div>
+    <div style="text-align:center;margin-top:10px;font-size:9px;color:var(--text3);font-family:var(--mono)">admin@agrosense.co · agro2026 | productor@agrosense.co · agro2026</div>
+  </div>
+</div>
+<div id="s-app" class="screen">
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:9px">
+    <div style="width:28px;height:28px;border-radius:8px;background:var(--green);border:1.5px solid var(--greenb);display:flex;align-items:center;justify-content:center;font-size:16px">🌱</div>
+    <div><div style="font-size:13px;font-weight:800">iAIRobots</div><div style="font-size:9px;color:var(--text3);font-family:var(--mono)">AGROSENSe Pro</div></div>
+  </div>
+  <div style="flex:1"></div>
+  <div style="display:flex;align-items:center;gap:7px">
+    <div id="abadge" class="badge bcr" style="cursor:pointer;display:none">⚠ 4</div>
+    <div class="pdot" style="width:7px;height:7px;border-radius:50%;background:var(--green2);flex-shrink:0"></div>
+    <div style="position:relative;cursor:pointer" onclick="togglePanel('agent-panel')">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--green);border:2px solid var(--greenb);display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>
+    </div>
+    <button onclick="doLogout()" class="btn bxs" style="background:#f8fafc;border:1px solid var(--border);color:var(--text2)">↩</button>
+  </div>
+</div>
+<div style="flex:1;overflow-y:auto;padding:12px">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px" id="he-kpis"></div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🏗</span><div><div style="font-size:13px;font-weight:700">Invernaderos</div><div style="font-size:10px;color:var(--text2)">35 estructuras · 14 zonas c/u</div></div></div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="badge bcr">🔴 3</span><span class="badge bwn">🟡 5</span><span class="badge bok">🟢 27</span></div>
+      </div>
+      <div id="si" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">🕸</span><div><div style="font-size:13px;font-weight:700">Casas Malla</div><div style="font-size:10px;color:var(--text2)">8 estructuras</div></div></div>
+        <div style="display:flex;align-items:center;gap:6px"><span class="badge bwn">🟡 2</span><span class="badge bok">🟢 6</span></div>
+      </div>
+      <div id="scm" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:6px"></div>
+    </div>
+    <div class="card"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">🚨 Alertas Activas</div><div id="al-lst" style="display:flex;flex-direction:column;gap:7px"></div></div>
+  </div>
+</div>
+<div style="background:#fff;border-top:1px solid var(--border);padding:5px 13px;display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono)">
+  <span>iAIRobots · AGROSENSe Pro v2.0 · iAGRI M3</span><span id="ft"></span>
+</div>
+</div>
+<div id="pov" class="pov" onclick="closePanel()"></div>
+<div id="agent-panel" class="side-panel">
+  <div style="padding:16px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:12px">
+    <div style="width:54px;height:54px;border-radius:50%;background:var(--green);border:2.5px solid var(--greenb);display:flex;align-items:center;justify-content:center;font-size:30px">🤖</div>
+    <div><div style="font-weight:800;font-size:14px">Juan Pablo Moreno</div><div style="font-size:11px;color:var(--text2)">Ingeniero Chief · iAIRobots</div><span class="badge bok" style="margin-top:4px">🟢 En línea</span></div>
+  </div>
+  <div style="padding:10px 14px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="semaforo sem-verde" id="sem-dot"></span><div style="font-size:12px;font-weight:700;color:var(--green)">Resumen del Sistema</div><span id="sem-lbl" style="font-size:9px;color:var(--text3);margin-left:auto">cargando...</span></div>
+    <div id="ag-st" style="display:flex;flex-direction:column;gap:5px"></div>
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"><div class="badge bok" style="padding:3px 7px">✅ AGROSENSe</div><div class="badge bin" style="padding:3px 7px">🔄 NOC OK</div><div class="badge bok" style="padding:3px 7px">✅ Supabase</div><div class="badge bok" style="padding:3px 7px">✅ WhatsApp</div></div>
+  </div>
+  <div style="border-top:1.5px solid var(--border);display:flex;flex-direction:column">
+    <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:12px;font-weight:700;color:var(--green)">💬 Akasha IA</div>
+      <div style="display:flex;align-items:center;gap:6px"><span id="stt-lbl" class="stt-status">🎤 Escuchando...</span><span style="font-size:10px;color:var(--text2)">🔊</span><input type="checkbox" id="voz-toggle" style="width:auto;padding:0" title="Voz"/></div>
+    </div>
+    <div id="chat-msgs" style="overflow-y:auto;padding:0 10px 8px;display:flex;flex-direction:column;gap:6px;min-height:160px;max-height:300px">
+      <div style="display:flex"><div class="chat-bbl-a">👋 ¡Hola! Soy Akasha. Pregúntame sobre alertas, sensores, correlaciones o agronomía.</div></div>
+    </div>
+    <div style="padding:7px 10px;border-top:1px solid var(--border);background:#fafcfa">
+      <div style="display:flex;gap:5px;margin-bottom:5px">
+        <input id="chat-input" type="text" placeholder="Pregunta a Akasha..." style="flex:1;font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()"/>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()">→</button>
+        <button class="chat-mic-btn" id="voz-mic" onclick="toggleVoiceInput()" title="Voz">🎤</button>
+      </div>
+      <div id="qpanel" style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="qbtn" onclick="quickAsk('¿Qué alertas activas hay ahora?')">⚠️ Alertas</button>
+        <button class="qbtn" onclick="quickAsk('Dame los KPIs del día.')">📊 KPIs</button>
+        <button class="qbtn" onclick="quickAsk('Correlación temperatura y etileno.')">🧪 Correl.</button>
+        <button class="qbtn" onclick="quickAsk('¿Cuándo regar según el sustrato actual?')">💧 Riego</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+var CFG={supa:'https://crfghwtfqaplzsmwylxe.supabase.co',anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64',voiceId:'21m00Tcm4TlvDq8ikWAM',actionsUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-actions',chatUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-chat',voiceUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-voice'};
+var chatHist=[],curUserName='',uRole='admin',_sessionId='sess_'+Math.random().toString(36).substr(2,9)+'_'+Date.now();
+var ALERTS_D=[{lv:'critico',msg:'Temperatura crítica Inv.06 Z2I: 34.8°C',ac:'Activar ventilación forzada norte',ok:false},{lv:'advertencia',msg:'Déficit hídrico Inv.11 Z4D: 58.2%VWC',ac:'Revisar goteo sector D-4',ok:false},{lv:'advertencia',msg:'Metano elevado Inv.03: 7.3 ppm',ac:'Verificar fermentación sustrato',ok:false},{lv:'info',msg:'Etileno sobre óptimo Inv.08 Z3D: 0.028ppm',ac:'Monitorear maduración',ok:false}];
+
+function doLogin(){
+  var u=document.getElementById('l-u').value.trim();
+  var p=document.getElementById('l-p').value.trim();
+  var ok=false;
+  if((u==='admin@agrosense.co'||u==='admin')&&p==='agro2026'){ok=true;uRole='admin';}
+  else if(u==='productor@agrosense.co'&&p==='agro2026'){ok=true;uRole='productor';}
+  if(ok){
+    curUserName=(uRole==='admin')?'Juan Pablo':'Carlos';
+    document.getElementById('s-login').classList.remove('active');
+    document.getElementById('s-app').classList.add('active');
+    initApp();
+    setTimeout(function(){try{greetVoice(curUserName);}catch(e){}},900);
+    try{loadQuickPrompts();loadSystemStatus();}catch(e){}
+  }else{
+    document.getElementById('l-err').style.display='block';
+  }
+}
+function doLogout(){document.getElementById('s-app').classList.remove('active');document.getElementById('s-login').classList.add('active');}
+document.getElementById('l-p').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+
+function initApp(){
+  var iS=['ok','ok','ok','warn','ok','crit','ok','warn','ok','ok','ok','ok','ok','ok','crit','ok','ok','warn','ok','ok','ok','ok','crit','ok','ok','ok','ok','ok','ok','ok','warn','ok','ok','ok','ok'];
+  var cmS=['ok','warn','ok','ok','ok','ok','warn','ok'];
+  buildSG('si','inv',35,iS);buildSG('scm','cm',8,cmS);buildKPIs();buildAlerts();
+  document.getElementById('abadge').style.display='flex';
+  var e=document.getElementById('ft');if(e)e.textContent=new Date().toLocaleString('es-CO',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'});
+}
+function buildSG(elId,tipo,cnt,statuses){
+  var el=document.getElementById(elId);if(!el)return;el.innerHTML='';
+  var ics={inv:'🏗',cm:'🕸',ca:'🌾'},lbls={inv:'INV.',cm:'CM.',ca:'CA.'};
+  for(var i=1;i<=cnt;i++){
+    var d=document.createElement('div'),st=statuses[i-1]||'ok';
+    d.className='sbox '+st;
+    d.innerHTML='<div style="font-size:13px">'+ics[tipo]+'</div><div style="font-size:9px;font-weight:700">'+lbls[tipo]+String(i).padStart(2,'0')+'</div><div style="width:7px;height:7px;border-radius:50%;background:'+(st==='crit'?'var(--red)':st==='warn'?'var(--amber)':'var(--green2)')+';margin:2px auto 0"></div>';
+    el.appendChild(d);
+  }
+}
+function buildKPIs(){
+  var e=document.getElementById('he-kpis');if(!e)return;
+  e.innerHTML='<div class="card" style="border-top:3px solid var(--green)"><div style="font-size:9px;color:var(--text2)">ESTRUCTURAS</div><div style="font-size:20px;font-weight:800;color:var(--green)">78</div><div style="font-size:9px;color:var(--text3)">35 inv · 8 cm · 35 ha</div></div><div class="card" style="border-top:3px solid var(--red)"><div style="font-size:9px;color:var(--text2)">ALERTAS</div><div style="font-size:20px;font-weight:800;color:var(--red)">4</div><div style="font-size:9px;color:var(--text3)">3 críticas · 1 aviso</div></div><div class="card" style="border-top:3px solid var(--blue)"><div style="font-size:9px;color:var(--text2)">IoT ACTIVOS</div><div style="font-size:20px;font-weight:800;color:var(--blue)">21</div><div style="font-size:9px;color:var(--text3)">NOC sync OK</div></div>';
+}
+function buildAlerts(){
+  var e=document.getElementById('al-lst');if(!e)return;e.innerHTML='';
+  ALERTS_D.forEach(function(a){
+    var d=document.createElement('div');
+    d.style.cssText='padding:9px 11px;border-radius:9px;border-left:4px solid '+(a.lv==='critico'?'var(--red)':a.lv==='advertencia'?'var(--amber)':'var(--blue)')+';border:1.5px solid '+(a.lv==='critico'?'var(--redb)':a.lv==='advertencia'?'var(--amberb)':'var(--blueb)')+';background:#fff;opacity:'+(a.ok?'0.5':'1');
+    d.innerHTML='<div style="font-size:11px;font-weight:600;margin-bottom:2px">'+a.msg+'</div><div style="font-size:10px;color:var(--text2)">→ '+a.ac+'</div>';
+    e.appendChild(d);
+  });
+}
+function togglePanel(id){
+  var p=document.getElementById(id),ov=document.getElementById('pov');
+  if(p.classList.contains('open')){p.classList.remove('open');ov.classList.remove('open');}
+  else{p.classList.add('open');ov.classList.add('open');}
+}
+function closePanel(){document.querySelectorAll('.side-panel').forEach(function(p){p.classList.remove('open');});var ov=document.getElementById('pov');if(ov)ov.classList.remove('open');}
+
+async function greetVoice(n){
+  var vc=document.getElementById('voz-toggle');
+  if(vc&&!vc.checked)return;
+  var t='Hola '+n+'! Bienvenido a iAgri AGROSENSe Pro. Soy Akasha.';
+  try{var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,voice_id:CFG.voiceId})});if(r.ok){var b=await r.blob();new Audio(URL.createObjectURL(b)).play();}}catch(e){}
+}
+async function loadSystemStatus(){
+  try{
+    var r=await fetch(CFG.actionsUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get_system_status',tenant_id:'hidroexpo'})});
+    var d=await r.json();
+    var dot=document.getElementById('sem-dot'),lbl=document.getElementById('sem-lbl');
+    if(!dot||!lbl)return;
+    var s=d.semaforo||'verde';
+    dot.className='semaforo sem-'+s;
+    lbl.textContent=(s==='verde'?'✅':s==='amarillo'?'⚠️':'🔴')+' '+(d.alertas_activas||0)+' alertas';
+  }catch(e){}
+}
+async function loadQuickPrompts(){
+  try{
+    var r=await fetch(CFG.actionsUrl+'?action=get_quick_prompts&org_id=hidroexpo');
+    var d=await r.json();
+    if(!d.prompts||!d.prompts.length)return;
+    var p=document.getElementById('qpanel');if(!p)return;
+    p.innerHTML=d.prompts.slice(0,6).map(function(q){return'<button class="qbtn" onclick="quickAsk('+JSON.stringify(q.prompt)+')">'+(q.emoji||'💬')+' '+q.label+'</button>';}).join('');
+  }catch(e){}
+}
+async function sendChat(){
+  var inp=document.getElementById('chat-input'),btn=document.getElementById('chat-send-btn');
+  var msg=inp.value.trim();if(!msg)return;
+  inp.value='';if(btn)btn.disabled=true;
+  addChatMsg(msg,'user');showTyping();
+  var t0=Date.now();
+  try{
+    var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,stats_context:'',history:chatHist.slice(-8),tenant_id:'hidroexpo',session_id:_sessionId})});
+    var d=await r.json();
+    hideTyping();
+    var rep=d.reply||'Sin respuesta.';
+    if(d.correlData&&d.correlData.pares&&d.correlData.pares.length>0){
+      var ct='\n\n📊 Correlaciones:\n';
+      d.correlData.pares.slice(0,4).forEach(function(p){if(p.correlacion!=null)ct+='• '+p.variable_x+' ↔ '+p.variable_y+': r='+p.correlacion+' ('+p.fuerza+')\n';});
+      rep+=ct;
+    }
+    addChatMsg(rep,'akasha',Date.now()-t0,d.model);
+    chatHist.push({role:'user',content:msg});chatHist.push({role:'assistant',content:rep});
+    var vt=document.getElementById('voz-toggle');
+    if(vt&&vt.checked){try{var vr=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:rep.replace(/\n/g,' ').substring(0,300),voice_id:CFG.voiceId})});if(vr.ok){var vb=await vr.blob();new Audio(URL.createObjectURL(vb)).play();}}catch(ve){}}
+    loadSystemStatus();
+  }catch(e){hideTyping();addChatMsg('⚠️ Error: '+e.message,'akasha');}
+  finally{if(btn)btn.disabled=false;inp.focus();}
+}
+function quickAsk(msg){document.getElementById('chat-input').value=msg;sendChat();var p=document.getElementById('agent-panel');if(!p.classList.contains('open'))togglePanel('agent-panel');}
+function addChatMsg(txt,who,ms,model){
+  var a=document.getElementById('chat-msgs');if(!a)return;
+  var w=document.createElement('div');w.style.cssText='display:flex;flex-direction:column;'+(who==='user'?'align-items:flex-end':'');
+  var d=document.createElement('div');d.className=(who==='user')?'chat-bbl-u':'chat-bbl-a';
+  d.innerHTML=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>');
+  w.appendChild(d);
+  if(who==='akasha'&&ms){var m=document.createElement('div');m.className='chat-meta';m.textContent=(model||'akasha')+' · '+ms+'ms';w.appendChild(m);}
+  a.appendChild(w);a.scrollTop=a.scrollHeight;
+}
+function showTyping(){var a=document.getElementById('chat-msgs');if(!a)return;var d=document.createElement('div');d.id='typing-ind';d.innerHTML='<div style="display:flex;align-items:center;gap:3px;padding:8px 12px;background:#f8fafc;border-radius:12px 12px 12px 4px;border:1px solid var(--border)"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';a.appendChild(d);a.scrollTop=a.scrollHeight;}
+function hideTyping(){var t=document.getElementById('typing-ind');if(t)t.remove();}
+function toggleVoiceInput(){
+  var btn=document.getElementById('voz-mic'),lbl=document.getElementById('stt-lbl');
+  if(!window.SpeechRecognition&&!window.webkitSpeechRecognition){alert('Requiere Chrome o Edge.');return;}
+  if(btn.classList.contains('active')){if(window._aRec)window._aRec.stop();btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  window._aRec=new SR();window._aRec.lang='es-ES';window._aRec.continuous=false;window._aRec.interimResults=false;
+  window._aRec.onresult=function(e){document.getElementById('chat-input').value=e.results[0][0].transcript;btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');sendChat();};
+  window._aRec.onend=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};
+  window._aRec.onerror=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};
+  window._aRec.start();btn.classList.add('active');btn.textContent='⏹';if(lbl)lbl.classList.add('vis');
+}
+</script>
+</body>
+</html>
