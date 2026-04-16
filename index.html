@@ -11,46 +11,22 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════════════
-   AGROSENSe Pro v11 — Bug Fixes + Async Chat + Slot Sync
-   Fonts: DM Sans (UI) + Space Mono (data)
+   AGROSENSe Pro v11.5 — Stella Maris Edition
+   Integración Visual Akasha + Fixes JS
 ═══════════════════════════════════════════════════ */
 :root{
-  /* Brand */
-  --ink:#0a1a0d;
-  --g:#0f6b2f;
-  --g2:#16a34a;
-  --g3:#22c55e;
-  --gl:#f0fdf4;
-  --gb:#bbf7d0;
-  --gd:#064e1c;
-  /* Status */
+  --ink:#0a1a0d; --g:#0f6b2f; --g2:#16a34a; --g3:#22c55e;
+  --gl:#f0fdf4; --gb:#bbf7d0; --gd:#064e1c;
   --ok:#16a34a; --okl:#f0fdf4; --okb:#bbf7d0;
   --wn:#b45309; --wnl:#fffbeb; --wnb:#fde68a;
   --cr:#b91c1c; --crl:#fff1f2; --crb:#fecdd3;
   --bl:#1d4ed8; --bll:#eff6ff; --blb:#bfdbfe;
-  /* Surface */
-  --bg:#f4f7f4;
-  --surf:#ffffff;
-  --surf2:#f8faf8;
-  --surf3:#f1f5f1;
-  /* Borders */
-  --line:#d4dbd4;
-  --line2:#e8eee8;
-  --line-dk:#2d4a2d;
-  /* Text */
-  --txt:#0a1a0d;
-  --txt2:#2d4a2d;
-  --txt3:#5a7a5a;
-  --txt4:#8fab8f;
-  /* Topbar dark */
-  --bar:#0b1f0e;
-  --bar2:#0f2d12;
-  /* Fonts */
-  --f:"DM Sans",system-ui,sans-serif;
-  --m:"Space Mono",monospace;
-  /* Radii */
+  --bg:#f4f7f4; --surf:#ffffff; --surf2:#f8faf8; --surf3:#f1f5f1;
+  --line:#d4dbd4; --line2:#e8eee8; --line-dk:#2d4a2d;
+  --txt:#0a1a0d; --txt2:#2d4a2d; --txt3:#5a7a5a; --txt4:#8fab8f;
+  --bar:#0b1f0e; --bar2:#0f2d12;
+  --f:"DM Sans",system-ui,sans-serif; --m:"Space Mono",monospace;
   --r4:4px; --r8:8px; --r12:12px; --r16:16px;
-  /* Shadows */
   --s1:0 1px 2px rgba(0,0,0,.06),0 1px 4px rgba(0,0,0,.04);
   --s2:0 2px 8px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
   --s3:0 8px 24px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.08);
@@ -59,12 +35,7 @@
 html,body{height:100%;overflow:hidden}
 body{background:var(--bg);color:var(--txt);font-family:var(--f);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button{font-family:var(--f);cursor:pointer;transition:all .12s}
-input,select,textarea{
-  font-family:var(--f);outline:none;background:var(--surf);
-  border:1px solid var(--line);border-radius:var(--r8);
-  color:var(--txt);padding:9px 12px;font-size:14px;width:100%;
-  transition:border-color .15s,box-shadow .15s;
-}
+input,select,textarea{font-family:var(--f);outline:none;background:var(--surf);border:1px solid var(--line);border-radius:var(--r8);color:var(--txt);padding:9px 12px;font-size:14px;width:100%;transition:border-color .15s,box-shadow .15s;}
 input:focus,select:focus{border-color:var(--g2);box-shadow:0 0 0 3px rgba(22,163,74,.1)}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'10\' height=\'6\'%3E%3Cpath d=\'M0 0l5 6 5-6z\' fill=\'%230f6b2f\'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px}
 ::-webkit-scrollbar{width:4px;height:4px}
@@ -72,498 +43,462 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=\'h
 ::-webkit-scrollbar-track{background:transparent}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-@keyframes blip{0%{opacity:.4;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
 .fade{animation:fadeUp .2s ease both}
 .pdot{animation:pulse 2s infinite}
-
-/* ── SCREENS ── */
 .screen{display:none;height:100vh}
 .screen.active{display:flex;flex-direction:column}
-
-/* ════════════════════════════════
-   LOGIN — Dark precision
-════════════════════════════════ */
-#s-login{
-  background:var(--bar);
-  align-items:center;justify-content:center;
-  padding:24px;position:relative;overflow:hidden;
-}
-#s-login::before{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:
-    repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(22,163,74,.025) 28px,rgba(22,163,74,.025) 29px),
-    repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(22,163,74,.025) 28px,rgba(22,163,74,.025) 29px);
-}
-#s-login::after{
-  content:"";position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(22,163,74,.4),transparent);
-}
-.lcard{
-  position:relative;z-index:1;
-  background:rgba(255,255,255,.97);
-  border:1px solid rgba(22,163,74,.25);
-  border-radius:var(--r16);
-  padding:40px 36px;width:100%;max-width:380px;
-  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(22,163,74,.1);
-  animation:fadeUp .4s ease;
-  backdrop-filter:blur(12px);
-}
-.lcard::before{
-  content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:120px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(34,197,94,.6),transparent);
-}
-.lav{
-  width:88px;height:88px;border-radius:18px;
-  margin:0 auto 20px;overflow:hidden;display:block;
-  border:1px solid rgba(22,163,74,.3);
-  box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(22,163,74,.25),0 6px 16px rgba(0,0,0,.12);
-}
-.ltitle{
-  font-size:22px;font-weight:700;text-align:center;
-  color:#0a1a0d;letter-spacing:-.3px;margin-bottom:2px;
-}
-.lsub{
-  font-size:11px;color:var(--g3);font-weight:400;text-align:center;
-  margin-bottom:3px;letter-spacing:.8px;text-transform:uppercase;
-  font-family:var(--m);
-}
+   /* LOGIN */
+#s-login{background:var(--bar);align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+#s-login::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(22,163,74,.025) 28px,rgba(22,163,74,.025) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(22,163,74,.025) 28px,rgba(22,163,74,.025) 29px);}
+#s-login::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(22,163,74,.4),transparent);}
+.lcard{position:relative;z-index:1;background:rgba(255,255,255,.97);border:1px solid rgba(22,163,74,.25);border-radius:var(--r16);padding:40px 36px;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(22,163,74,.1);animation:fadeUp .4s ease;backdrop-filter:blur(12px);}
+.lav{width:88px;height:88px;border-radius:18px;margin:0 auto 20px;overflow:hidden;display:block;border:1px solid rgba(22,163,74,.3);box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(22,163,74,.25),0 6px 16px rgba(0,0,0,.12);object-fit:cover;}
+.stella-watermark{position:absolute;bottom:20px;right:20px;width:120px;opacity:0.1;pointer-events:none;}
+.ltitle{font-size:22px;font-weight:700;text-align:center;color:#0a1a0d;letter-spacing:-.3px;margin-bottom:2px;}
+.lsub{font-size:11px;color:var(--g3);font-weight:400;text-align:center;margin-bottom:3px;letter-spacing:.8px;text-transform:uppercase;font-family:var(--m);}
 .ltag{font-size:11px;color:#6b7280;text-align:center;margin-bottom:28px;font-family:var(--m)}
-.llbl{
-  font-size:10px;font-weight:600;color:#374151;
-  margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;display:block;
-  font-family:var(--m);
-}
+.llbl{font-size:10px;font-weight:600;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;display:block;font-family:var(--m);}
 .lfield{margin-bottom:14px}
-.lfield input{
-  background:#f8faf8;border:1px solid #d1d5db;
-  color:#0a1a0d;border-radius:var(--r8);
-  transition:border-color .15s,background .15s;
-}
-.lfield input:focus{
-  background:rgba(22,163,74,.05);
-  border-color:rgba(22,163,74,.4);
-  box-shadow:0 0 0 3px rgba(22,163,74,.08);
-}
-.lfield input::placeholder{color:#9ca3af}
-.lbtn{
-  width:100%;padding:13px;margin-top:6px;
-  background:var(--g2);color:#fff;
-  font-size:14px;font-weight:700;letter-spacing:.2px;
-  border:none;border-radius:var(--r8);cursor:pointer;
-  box-shadow:0 4px 16px rgba(22,163,74,.35);
-  transition:all .15s;
-}
+.lfield input{background:#f8faf8;border:1px solid #d1d5db;color:#0a1a0d;border-radius:var(--r8);transition:border-color .15s,background .15s;}
+.lfield input:focus{background:rgba(22,163,74,.05);border-color:rgba(22,163,74,.4);box-shadow:0 0 0 3px rgba(22,163,74,.08);}
+.lbtn{width:100%;padding:13px;margin-top:6px;background:var(--g2);color:#fff;font-size:14px;font-weight:700;letter-spacing:.2px;border:none;border-radius:var(--r8);cursor:pointer;box-shadow:0 4px 16px rgba(22,163,74,.35);transition:all .15s;}
 .lbtn:hover{background:var(--g3);box-shadow:0 6px 20px rgba(34,197,94,.4);transform:translateY(-1px)}
-.lbtn:active{transform:translateY(0);box-shadow:0 2px 8px rgba(22,163,74,.3)}
-#l-err{
-  display:none;font-size:11px;color:#fca5a5;text-align:center;
-  margin-top:8px;padding:8px;background:rgba(185,28,28,.15);
-  border-radius:var(--r8);border:1px solid rgba(185,28,28,.3);
-  font-family:var(--m);
-}
-.lhint{text-align:center;margin-top:14px;font-size:10px;color:#9ca3af;font-family:var(--m)}
+#l-err{display:none;font-size:11px;color:#fca5a5;text-align:center;margin-top:8px;padding:8px;background:rgba(185,28,28,.15);border-radius:var(--r8);border:1px solid rgba(185,28,28,.3);font-family:var(--m);}
 
-/* ════════════════════════════════
-   TOPBAR
-════════════════════════════════ */
-.topbar{
-  background:var(--bar);height:48px;
-  padding:0 14px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid rgba(22,163,74,.15);
-  position:relative;
-}
-.topbar::after{
-  content:"";position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(34,197,94,.2),transparent);
-  pointer-events:none;
-}
+/* UI ELEMENTS */
+.topbar{background:var(--bar);height:56px;padding:0 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(22,163,74,.15);position:relative;}
 .tbrand{display:flex;align-items:center;gap:9px}
-.tav{width:30px;height:30px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.12);flex-shrink:0}
-.ttitle{font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px}
-.tsub{font-size:9px;color:rgba(255,255,255,.35);font-family:var(--m);letter-spacing:.4px}
-.tbc{flex:1;display:flex;align-items:center;gap:4px;justify-content:center;margin:0 12px;overflow:hidden}
-.tright{display:flex;align-items:center;gap:6px}
-.tkpi{
-  display:flex;align-items:center;gap:5px;
-  padding:4px 10px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:6px;
-}
-.tkpi span{font-size:11px;color:rgba(255,255,255,.75);font-family:var(--m);font-weight:400}
-.tbtn{
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
-  color:rgba(255,255,255,.7);padding:5px 11px;border-radius:6px;
-  font-size:11px;font-weight:500;font-family:var(--m);
-}
-.tbtn:hover{background:rgba(255,255,255,.12);color:#fff}
-
-/* ADMIN BAR */
-#admin-bar{
-  background:var(--surf);border-bottom:1px solid var(--line);
-  padding:5px 14px;display:none;flex-shrink:0;
-}
-
-/* ════════════════════════════════
-   LAYOUT
-════════════════════════════════ */
+.tav{height:36px;border-radius:4px;object-fit:contain;}
+.tbtn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7);padding:5px 11px;border-radius:6px;font-size:11px;font-weight:500;font-family:var(--m);}
+#admin-bar{background:var(--surf);border-bottom:1px solid var(--line);padding:5px 14px;display:none;flex-shrink:0;}
 #app-body{display:flex;flex:1;overflow:hidden;min-height:0}
 #mc{flex:1;overflow-y:auto;min-width:0;background:var(--bg)}
 
-/* ════════════════════════════════
-   JUAN PABLO SIDEBAR
-════════════════════════════════ */
-#ak-side{
-  width:280px;flex-shrink:0;background:var(--surf);
-  border-left:1px solid var(--line);
-  display:flex;flex-direction:column;overflow:hidden;
-}
+/* JUAN PABLO SIDEBAR */
+#ak-side{width:280px;flex-shrink:0;background:var(--surf);border-left:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;}
 @media(max-width:860px){#ak-side{display:none}}
-.ak-hd{
-  background:var(--bar2);
-  padding:10px 12px;
-  display:flex;align-items:center;gap:9px;flex-shrink:0;
-  border-bottom:1px solid rgba(22,163,74,.15);
-}
-.ak-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,.15);flex-shrink:0}
+.ak-hd{background:var(--bar2);padding:10px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;border-bottom:1px solid rgba(22,163,74,.15);}
+.ak-av{width:38px;height:38px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,255,255,.15);flex-shrink:0;object-fit:cover;}
 .ak-nm{font-weight:700;font-size:12px;color:#fff;letter-spacing:-.1px}
 .ak-rl{font-size:9px;color:rgba(255,255,255,.45);font-family:var(--m);letter-spacing:.4px}
-.ak-st{
-  padding:5px 12px;background:var(--gl);
-  border-bottom:1px solid var(--gb);
-  font-size:11px;color:var(--g2);
-  display:flex;align-items:center;gap:6px;flex-shrink:0;
-  font-family:var(--m);
-}
-#chat-msgs{
-  flex:1;overflow-y:auto;padding:9px;
-  display:flex;flex-direction:column;gap:6px;
-  background:var(--surf2);min-height:0;
-}
-#qpanel{
-  display:flex;gap:3px;padding:5px 7px;flex-wrap:wrap;
-  border-top:1px solid var(--line);background:var(--surf);flex-shrink:0;
-}
-.ak-in{padding:7px;border-top:1px solid var(--line);background:var(--surf);flex-shrink:0}
-.ak-inrow{display:flex;gap:4px}
-.ak-send{
-  flex-shrink:0;border:none;background:var(--g2);color:#fff;
-  padding:8px 12px;border-radius:var(--r8);font-size:13px;font-weight:600;
-}
-.ak-send:disabled{opacity:.4;cursor:not-allowed}
-.ak-mic{
-  flex-shrink:0;border:1px solid var(--line);background:var(--surf);
-  padding:8px 9px;border-radius:var(--r8);font-size:11px;
-}
-.ak-mic.active{background:var(--crl);border-color:var(--crb)}
-
-/* CHAT BUBBLES */
-.chat-bbl-u{
-  background:var(--gl);border-radius:12px 12px 3px 12px;
-  padding:9px 12px;font-size:12px;max-width:84%;
-  color:var(--gd);word-break:break-word;line-height:1.55;
-  border:1px solid var(--gb);
-}
-.chat-bbl-a{
-  background:var(--surf);border-radius:12px 12px 12px 3px;
-  padding:9px 12px;font-size:12px;max-width:90%;
-  border:1px solid var(--line);color:var(--txt);
-  word-break:break-word;line-height:1.55;
-}
-.chat-meta{font-size:9px;color:var(--txt4);margin-top:2px;text-align:right;font-family:var(--m)}
+.ak-st{padding:5px 12px;background:var(--gl);border-bottom:1px solid var(--gb);font-size:11px;color:var(--g2);display:flex;align-items:center;gap:6px;flex-shrink:0;font-family:var(--m);}
+#chat-msgs{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:6px;background:var(--surf2);min-height:0;background-image:url('assets/stella-maris.png');background-size:60%;background-position:center;background-repeat:no-repeat;background-blend-mode:luminosity;}
+.chat-bbl-u{background:var(--gl);border-radius:12px 12px 3px 12px;padding:9px 12px;font-size:12px;max-width:84%;color:var(--gd);word-break:break-word;line-height:1.55;border:1px solid var(--gb);}
+.chat-bbl-a{background:var(--surf);border-radius:12px 12px 12px 3px;padding:9px 12px;font-size:12px;max-width:90%;border:1px solid var(--line);color:var(--txt);word-break:break-word;line-height:1.55;box-shadow:var(--s1);}
 .typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--g3);animation:pulse 1.2s infinite;margin:0 2px}
 .typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
 .semaforo{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
 .sem-verde{background:#22c55e}.sem-amarillo{background:#f59e0b}.sem-rojo{background:#ef4444;animation:pulse 1s infinite}
-.qbtn{
-  font-size:10px;padding:3px 7px;border-radius:5px;
-  border:1px solid var(--line);background:var(--surf);
-  cursor:pointer;color:var(--txt3);white-space:nowrap;
-  transition:all .12s;font-weight:500;font-family:var(--m);
-}
-.qbtn:hover{border-color:var(--g2);background:var(--gl);color:var(--g2)}
-.stt-st{display:none;font-size:9px;color:var(--g2);padding:2px 6px;background:var(--gl);border-radius:4px;margin-top:3px;font-family:var(--m)}
-.stt-st.vis{display:inline-block}
+.ak-in{padding:7px;border-top:1px solid var(--line);background:var(--surf);flex-shrink:0}
 
-/* FOOTER */
-.appft{
-  background:var(--bar);padding:3px 14px;
-  display:flex;justify-content:space-between;
-  font-size:9px;color:rgba(255,255,255,.25);font-family:var(--m);flex-shrink:0;
-  border-top:1px solid rgba(255,255,255,.04);
-}
-
-/* ════════════════════════════════
-   CARDS & BASE COMPONENTS
-════════════════════════════════ */
-.card{
-  background:var(--surf);border:1px solid var(--line);
-  border-radius:var(--r12);padding:14px;
-  box-shadow:var(--s1);
-}
-.card-ok{background:var(--okl);border-color:var(--okb)}
-.card-wn{background:var(--wnl);border-color:var(--wnb)}
-.card-bl{background:var(--bll);border-color:var(--blb)}
-
-/* BADGES */
+/* CARDS & BADGES */
+.card{background:var(--surf);border:1px solid var(--line);border-radius:var(--r12);padding:14px;box-shadow:var(--s1);}
 .badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap;font-family:var(--m)}
 .bok{background:var(--okl);color:#14532d;border:1px solid var(--okb)}
 .bwn{background:var(--wnl);color:#78350f;border:1px solid var(--wnb)}
 .bcr{background:var(--crl);color:#881337;border:1px solid var(--crb)}
-.bin{background:var(--bll);color:#1e3a8a;border:1px solid var(--blb)}
-.bgr{background:var(--surf3);color:var(--txt3);border:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;border-radius:var(--r8);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .12s;}
+.btp{background:var(--g2);color:#fff}.bto{background:var(--surf);color:var(--g2);border:1px solid var(--g3)}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;border-radius:var(--r8);font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .12s;white-space:nowrap}
-.btp{background:var(--g2);color:#fff}.btp:hover{background:var(--g3)}
-.bto{background:var(--surf);color:var(--g2);border:1px solid var(--g3)}.bto:hover{background:var(--gl)}
-.btr{background:var(--surf);color:var(--cr);border:1px solid var(--crb)}
-.bsm{padding:5px 11px;font-size:11px}
-.bxs{padding:3px 8px;font-size:10px;border-radius:5px}
-
-/* NAV TABS */
-.nav-btn{
-  flex-shrink:0;border:none;background:transparent;
-  color:var(--txt3);padding:9px 12px;font-size:11px;font-weight:500;
-  white-space:nowrap;border-bottom:2px solid transparent;
-  cursor:pointer;transition:all .12s;font-family:var(--m);
-}
-.nav-btn.active{border-bottom-color:var(--g2);color:var(--g2);background:var(--gl);font-weight:700}
-
-/* TAB PANES */
-.tab-pane{display:none}
-.tab-pane.active{display:block;animation:fadeUp .2s ease}
-
-/* ── STRUCTURE BOXES ── */
-.sbox{
-  border-radius:var(--r8);padding:9px 6px;cursor:pointer;
-  border:1px solid var(--line);background:var(--surf);
-  text-align:center;transition:all .12s;
-  box-shadow:var(--s1);
-}
-.sbox:hover{border-color:var(--g2);background:var(--gl);transform:translateY(-1px);box-shadow:var(--s2)}
-.sbox.ok{border-color:var(--okb);background:var(--okl)}
-.sbox.warn{border-color:var(--wnb);background:var(--wnl)}
-.sbox.crit{border-color:var(--crb);background:var(--crl)}
-.sbox div:first-child{font-size:15px}
-.sbox div:nth-child(2){font-size:10px;font-weight:700;margin-top:2px;color:var(--txt2);font-family:var(--m)}
-
-/* ── ZONE BOXES ── */
-.zbox{
-  border-radius:var(--r8);padding:8px 5px;cursor:pointer;
-  border:1px solid var(--line);background:var(--surf);
-  text-align:center;transition:all .12s;box-shadow:var(--s1);
-}
-.zbox.ok{border-color:var(--okb);background:var(--okl);color:var(--ok)}
-.zbox.warn{border-color:var(--wnb);background:var(--wnl);color:var(--wn)}
-.zbox.crit{border-color:var(--crb);background:var(--crl);color:var(--cr)}
-.zbox:hover{transform:scale(1.05);box-shadow:var(--s2)}
-.zbox div:first-child{font-size:12px;font-weight:700;font-family:var(--m)}
-.zbox div:nth-child(2){font-size:11px;font-family:var(--m);font-weight:600}
-.zbox div:nth-child(3){font-size:8px;opacity:.65;font-family:var(--m)}
-
-/* ── VCHIP ── */
-.vchip{
-  display:inline-flex;align-items:center;gap:5px;
-  padding:5px 10px;border-radius:var(--r8);font-size:11px;
-  cursor:pointer;border:1px solid var(--line);
-  background:var(--surf);color:var(--txt3);
-  transition:all .12s;white-space:nowrap;font-weight:500;
-  box-shadow:var(--s1);font-family:var(--m);
-}
-.vchip.active{border-color:var(--g2);background:var(--gl);color:var(--g2);font-weight:700}
-.vchip.vwn{border-color:var(--wnb);background:var(--wnl);color:var(--wn)}
-.vchip.vcr{border-color:var(--crb);background:var(--crl);color:var(--cr)}
-
-/* TABLE */
-.tbl{width:100%;border-collapse:collapse;font-size:12px}
-.tbl th{
-  background:var(--surf3);padding:8px 10px;text-align:left;
-  color:var(--txt3);font-weight:600;border-bottom:1px solid var(--line);
-  font-size:10px;letter-spacing:.5px;text-transform:uppercase;font-family:var(--m);
-}
-.tbl td{padding:8px 10px;border-bottom:1px solid var(--line2);font-family:var(--m)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--surf3)}
-
-/* IOT NODE */
-.iotn{
-  display:flex;align-items:center;gap:9px;padding:9px 11px;
-  border-radius:var(--r8);border:1px solid var(--line);
-  background:var(--surf);cursor:pointer;transition:all .12s;box-shadow:var(--s1);
-}
-.iotn.sel{border-color:var(--bl);background:var(--bll)}
-.idot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-
-/* HERO */
-#st-hero{display:none;width:100%;height:160px;position:relative;overflow:hidden}
-#st-hero img{width:100%;height:100%;object-fit:cover;object-position:center 38%}
-#st-hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.02),rgba(6,78,28,.8))}
+/* HERO & VISUALS */
+#st-hero{display:none;width:100%;height:180px;position:relative;overflow:hidden}
+#st-hero img{width:100%;height:100%;object-fit:cover;object-position:center 45%}
+#st-hero-ov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.05),rgba(6,78,28,.85))}
 #st-hero-info{position:absolute;bottom:0;left:0;right:0;padding:12px 14px}
-#st-hero-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px}
-#st-hero-sub{font-size:10px;color:rgba(255,255,255,.8);margin-top:2px;font-family:var(--m);letter-spacing:.2px}
-#st-hero-badge{position:absolute;top:10px;right:12px}
+#st-hero-name{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.3px}
 
-/* MODAL */
+/* MODULES */
+.sbox, .zbox{border-radius:var(--r8);padding:9px 6px;cursor:pointer;border:1px solid var(--line);background:var(--surf);text-align:center;transition:all .12s;box-shadow:var(--s1);}
+.zbox:hover{transform:scale(1.05);box-shadow:var(--s2)}
+.nav-btn{border:none;background:transparent;color:var(--txt3);padding:9px 12px;font-size:11px;font-weight:500;border-bottom:2px solid transparent;cursor:pointer;font-family:var(--m);}
+.nav-btn.active{border-bottom-color:var(--g2);color:var(--g2);background:var(--gl);font-weight:700}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .2s ease}
 .modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
 .modal-bg.open{display:flex}
 .modal{background:var(--surf);border-radius:var(--r16);padding:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--s3);border:1px solid var(--line)}
-.side-panel{position:fixed;right:0;top:0;bottom:0;width:min(305px,94vw);background:var(--surf);box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:300;transform:translateX(110%);transition:transform .25s ease;overflow-y:auto;border-left:1px solid var(--line)}
-.side-panel.open{transform:translateX(0)}
-.pov{position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.18);display:none}
-.pov.open{display:block}
-
-/* BREADCRUMB */
-.bci{font-size:11px;color:rgba(255,255,255,.5);cursor:pointer;padding:2px 6px;border-radius:4px;font-family:var(--m)}
-.bci:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.85)}
-.bci.active{color:rgba(255,255,255,.9);font-weight:700}
-.bcs{color:rgba(255,255,255,.2);font-size:10px;font-family:var(--m)}
-
-/* HMR */
-.hmr{display:flex;align-items:center;gap:5px;margin-bottom:4px}
-
-/* KPI HOME */
-.he-kpi{
-  background:var(--surf);border:1px solid var(--line);
-  border-radius:var(--r12);padding:14px;box-shadow:var(--s1);
-}
-
-/* SECTION HEADER */
-.sec-hd{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:9px 12px;cursor:pointer;
-  background:var(--surf);border:1px solid var(--line);
-  border-radius:var(--r8);margin-bottom:7px;box-shadow:var(--s1);
-  transition:all .12s;
-}
-.sec-hd:hover{background:var(--gl);border-color:var(--okb)}
-
-/* VAR ROW */
-#var-row{
-  padding:5px 12px;background:var(--surf);
-  border-bottom:1px solid var(--line);
-  display:flex;gap:5px;overflow-x:auto;flex-shrink:0;
-}
-
-/* STAT PILL (KPI in dash) */
-.stat-pill{
-  background:var(--surf);border:1px solid var(--line);
-  border-radius:var(--r8);padding:10px 12px;
-  cursor:pointer;transition:all .12s;box-shadow:var(--s1);
-}
-.stat-pill:hover{border-color:var(--g2);background:var(--gl)}
-.stat-pill .sp-ic{font-size:11px;color:var(--txt4);font-family:var(--m);letter-spacing:.3px;text-transform:uppercase}
-.stat-pill .sp-vl{font-size:18px;font-weight:700;font-family:var(--m);margin:2px 0;letter-spacing:-.5px}
-.stat-pill .sp-lb{font-size:10px;color:var(--txt3);font-family:var(--m)}
-
-/* LM ROW */
-.lm-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:8px 10px;border-radius:var(--r8);
-  border:1px solid var(--line2);background:var(--surf2);
-  margin-bottom:4px;transition:background .12s;
-}
-.lm-row:hover{background:var(--gl)}
 </style>
 </head>
 <body>
-
-<div id="s-login" class="screen active">
+   <div id="s-login" class="screen active">
+  <img src="assets/stella-maris.png" class="stella-watermark" alt="Stella Maris Group"/>
   <div class="lcard">
-    <img class="lav" src="data:image/jpeg;base64,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" alt="iAGRI"/>
+    <img class="lav" src="assets/ia-irobots.png" alt="iAIRobots Logo"/>
     <div class="ltitle">iAIRobots</div>
     <div class="lsub">AGROSENSe Pro</div>
-    <div class="ltag">IA · IoT · Rob&oacute;tica · Agricultura 5.0</div>
-    <div class="lfield"><label class="llbl" for="l-u">USUARIO</label>
-      <input id="l-u" type="text" value="admin@agrosense.co" placeholder="usuario@empresa.co"/></div>
-    <div class="lfield"><label class="llbl" for="l-p">CONTRASE&Ntilde;A</label>
-      <input id="l-p" type="password" value="agro2026" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"/></div>
+    <div class="ltag">IA · IoT · Robótica · Agricultura 5.0</div>
+    <div class="lfield">
+      <label class="llbl" for="l-u">USUARIO</label>
+      <input id="l-u" type="text" value="admin@agrosense.co" placeholder="usuario@empresa.co"/>
+    </div>
+    <div class="lfield">
+      <label class="llbl" for="l-p">CONTRASEÑA</label>
+      <input id="l-p" type="password" value="agro2026" placeholder="••••••••"/>
+    </div>
     <button onclick="doLogin()" class="lbtn">INGRESAR &rarr;</button>
     <div id="l-err">CREDENCIALES INCORRECTAS</div>
     <div class="lhint">admin@agrosense.co / agro2026</div>
   </div>
 </div>
-
 <div id="s-app" class="screen">
   <div class="topbar">
     <div class="tbrand">
-      <div class="tav"><img src="data:image/jpeg;base64,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" style="width:100%;height:100%;object-fit:cover"/></div>
-      <div><div class="ttitle">iAIRobots</div><div class="tsub">AGROSENSE PRO v11</div></div>
+      <img src="assets/iagritrasp.png" class="tav" alt="iAGRI"/>
+      <div><div class="ttitle">iAIRobots</div><div class="tsub">AGROSENSe PRO v11.5</div></div>
     </div>
     <div id="top-bc" class="tbc" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"></div>
     <div class="tright">
       <div id="abadge" class="badge bcr" style="cursor:pointer;display:none" onclick="gotoAlerts()">&#9888; 4</div>
       <div class="tkpi">
         <div class="pdot" style="width:6px;height:6px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
-        <span id="t-tmp">&mdash;C</span>
-        <span id="t-hum" style="border-left:1px solid rgba(255,255,255,.08);padding-left:7px">&mdash;%</span>
-        <span id="t-co2" style="border-left:1px solid rgba(255,255,255,.08);padding-left:7px">&mdash;ppm</span>
+        <span id="t-tmp" style="font-family:var(--m);font-size:11px;color:rgba(255,255,255,.8)">&mdash;C</span>
+        <span id="t-hum" style="border-left:1px solid rgba(255,255,255,.08);padding-left:7px;font-family:var(--m);font-size:11px;color:rgba(255,255,255,.8)">&mdash;%</span>
       </div>
-      <button onclick="doLogout()" class="tbtn">EXIT</button>
+      <button onclick="doLogout()" class="tbtn">SALIR</button>
     </div>
   </div>
+  
   <div id="admin-bar">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span class="badge bin">ADMIN</span>
-      <span style="font-size:11px;color:var(--txt3);font-family:var(--m)">CLIENT</span>
+      <span class="badge bin">STELLA MARIS ADMIN</span>
+      <span style="font-size:11px;color:var(--txt3);font-family:var(--m)">COMPLEJO</span>
       <select id="sel-client" onchange="onClientChange()" style="flex:1;min-width:140px;font-size:11px;padding:4px 24px 4px 8px;font-family:var(--m)">
-        <option value="hidroexpo">HidroExpo · Condominio</option>
-        <option value="d1">Finca El Progreso</option>
-        <option value="d2">AgroDemo S.A.S</option>
+        <option value="hidroexpo">Project One SV - Lourdes</option>
+        <option value="d1">AgroDemo S.A.S</option>
       </select>
       <div id="admin-kpis" style="display:flex;gap:4px;flex-wrap:wrap"></div>
     </div>
   </div>
+  
   <div id="app-body">
     <div id="mc">
-
-<div id="v-he" class="tab-pane active fade" style="padding:12px">
+       <div id="v-he" class="tab-pane active fade" style="padding:12px">
   <div id="he-kpis" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"></div>
   <div style="display:flex;flex-direction:column;gap:8px">
     <div class="card">
-      <div class="sec-hd" onclick="toggleSec(\'si\')">
+      <div class="sec-hd" onclick="toggleSec('si')">
         <div>
           <div style="font-size:13px;font-weight:700;font-family:var(--m)">INV &mdash; INVERNADEROS</div>
           <div style="font-size:10px;color:var(--txt4);font-family:var(--m)">35 estructuras &middot; 14 zonas c/u</div>
         </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <span class="badge bcr">3</span><span class="badge bwn">5</span><span class="badge bok">27</span>
-          <span style="color:var(--txt4);font-size:10px;font-family:var(--m);margin-left:2px">&#9660;</span>
-        </div>
+        <div style="display:flex;align-items:center;gap:4px"><span class="badge bcr">3</span><span class="badge bwn">5</span><span class="badge bok">27</span></div>
       </div>
       <div id="si" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:5px"></div>
-    </div>
-    <div class="card">
-      <div class="sec-hd" onclick="toggleSec(\'scm\')">
-        <div>
-          <div style="font-size:13px;font-weight:700;font-family:var(--m)">CM &mdash; CASAS MALLA</div>
-          <div style="font-size:10px;color:var(--txt4);font-family:var(--m)">8 estructuras &middot; 14 zonas c/u</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <span class="badge bwn">2</span><span class="badge bok">6</span>
-          <span style="color:var(--txt4);font-size:10px;font-family:var(--m);margin-left:2px">&#9660;</span>
-        </div>
-      </div>
-      <div id="scm" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:5px"></div>
-    </div>
-    <div class="card">
-      <div class="sec-hd" onclick="toggleSec(\'sca\')">
-        <div>
-          <div style="font-size:13px;font-weight:700;font-family:var(--m)">CA &mdash; CAMPO ABIERTO</div>
-          <div style="font-size:10px;color:var(--txt4);font-family:var(--m)">35 ha &middot; 8 zonas &middot; 1,250m&sup2;</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <span class="badge bwn">4</span><span class="badge bok">31</span>
-          <span style="color:var(--txt4);font-size:10px;font-family:var(--m);margin-left:2px">&#9660;</span>
-        </div>
-      </div>
-      <div id="sca" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:5px"></div>
     </div>
   </div>
 </div>
 
 <div id="v-st" class="tab-pane" style="padding:0">
   <div id="st-hero">
-    <img src="data:image/jpeg;base64,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b3nHHhy39tON3xWThlsLC5c8/DBCmqL8mCg23Hdh87yo0chqqQFqVz2f6M/inw8cCkksy2sO++HLgljSw1gLHVZrrYX5Nbb6sSTRRuUaMHrWCqORJwEiqusFS3MEAnme3fuxaEnWjdtZtc21X0nuxnbPZqeWEs66jYg7m/Pw/wDOKrIwjd2FwrEhkFuwnl24txTGMaGFrEEhvVe/vxMIFlAeNlRSFA7Qbgn1csalUPaNjGGU61N7ops3Mjl6sdie4LhrMbHSTyPox3NFpQyKouSroy7g2J+3ESOW6LpgrqTpu/NesRe+GSpn4Swzr5MgJNlPVF+Yudj4b4eIo9wbKQPOAsS3db14rpGskjskjRuGIWKQ7bdoIxyoMaHpkCm50lQTv33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+    <img src="assets/agricola.png" id="st-hero-img" alt="Vista Invernadero"/>
+    <div id="st-hero-ov"></div>
+    <div id="st-hero-info">
+      <div id="st-hero-name">Invernadero 01</div>
+      <div id="st-hero-sub">14 ZONAS &middot; 7&times;36m &middot; TOMATE CHERRY &middot; SEM.8</div>
+    </div>
+  </div>
+  <div style="padding:11px">
+    <div style="display:flex;gap:5px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:10px;color:var(--txt3);font-weight:600;font-family:var(--m)">SLOT</span>
+      <select id="sv-slot" onchange="refreshSV()" style="width:auto;font-size:11px;padding:4px 22px 4px 7px;font-family:var(--m)">
+        <option value="1">06:00</option><option value="3" selected>12:00</option><option value="5">18:00</option>
+      </select>
+      <div id="sv-vc" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+    </div>
+    <div id="sv-zn" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:5px;margin-bottom:10px"></div>
+    <canvas id="sv-cv" style="width:100%;border-radius:var(--r8);display:block;border:1px solid var(--line)" height="195"></canvas>
+  </div>
+</div>
+
+<div id="v-zn" class="tab-pane" style="padding:12px">
+  <div id="zv-vars" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-bottom:12px"></div>
+  <div class="card" id="zv-cc" style="margin-bottom:10px;display:none">
+    <canvas id="zv-chart" height="155" style="width:100%;display:block"></canvas>
+  </div>
+</div>
+<div id="v-db" class="tab-pane" style="display:flex;flex-direction:column;min-height:0">
+  <div id="var-row"></div>
+  <div style="background:var(--surf);border-bottom:1px solid var(--line);display:flex;overflow-x:auto;padding:0 8px;flex-shrink:0">
+    <button class="nav-btn active" onclick="showDT('dt-dash',this)">DASH</button>
+    <button class="nav-btn" onclick="showDT('dt-mapa',this)">MAPA</button>
+    <button class="nav-btn" onclick="showDT('dt-robot',this)">ROBOT</button>
+    <button class="nav-btn" onclick="showDT('dt-iot',this)">IoT</button>
+    <button class="nav-btn" onclick="showDT('dt-audit',this)">AUDIT</button>
+  </div>
+  <div style="padding:11px;flex:1;overflow-y:auto">
+    
+    <div id="dt-dash" class="tab-pane active fade">
+      <div id="dt-kpis" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px"></div>
+      <canvas id="dt-cv" style="width:100%;border-radius:6px;cursor:pointer;display:block" height="175"></canvas>
+    </div>
+
+    <div id="dt-mapa" class="tab-pane">
+      <div class="card" style="margin-bottom:9px"><canvas id="hmap" style="width:100%;border-radius:6px;display:block"></canvas></div>
+    </div>
+
+    <div id="dt-robot" class="tab-pane">
+      <div class="card" style="margin-bottom:8px; text-align:center; background:#f0fdf4;">
+        <img src="assets/iamando.png" style="max-height:100px; object-fit:contain; margin-bottom:10px;" alt="Control Robot"/>
+        <div style="font-size:11px;font-weight:700;color:var(--txt2);font-family:var(--m);">ENLACE TELEMETRÍA OK</div>
+      </div>
+      <div class="card" style="margin-bottom:8px">
+        <div style="font-size:10px;font-weight:700;color:var(--txt3);margin-bottom:8px;font-family:var(--m)">MODO DE NAVEGACIÓN</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button onclick="setRM('auto')" id="rm-auto" class="btn btp bsm" style="font-family:var(--m)">AUTÓNOMO</button>
+          <button onclick="setRM('manual')" id="rm-manual" class="btn bto bsm" style="font-family:var(--m)">RC MANUAL</button>
+        </div>
+      </div>
+      <div class="card">
+        <button onclick="startRobot()" id="rob-btn" class="btn btp" style="width:100%;padding:11px;font-size:13px;font-family:var(--m)">▶ INICIAR PATRULLAJE</button>
+        <div id="rob-pg" style="display:none;margin-top:12px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--m)"><span id="rob-lb">Iniciando...</span><span id="rob-pc">0%</span></div>
+          <div style="background:var(--surf3);height:4px;margin-bottom:10px;border-radius:2px"><div id="rob-br" style="background:var(--g2);height:100%;width:0%;transition:width .4s"></div></div>
+          <div id="rob-zl" style="display:flex;flex-direction:column;gap:4px"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="dt-iot" class="tab-pane"><div id="iot-gd" style="display:grid;grid-template-columns:1fr 1fr;gap:7px"></div></div>
+    <div id="dt-audit" class="tab-pane"><div class="card" style="overflow-x:auto"><table class="tbl"><tbody id="au-tb"></tbody></table></div></div>
+  </div>
+</div>
+</div>```
+
+---
+
+### PARTE 7: Juan Pablo AI Chat Sidebar (HTML)
+*Va justo después de la Parte 6. Integramos el avatar de Juan Pablo.*
+
+```html
+    <div id="ak-side">
+      <div class="ak-hd">
+        <img class="ak-av" src="assets/jp-oa-i-robots.png" alt="Juan Pablo AI"/>
+        <div style="flex:1">
+          <div class="ak-nm">Juan Pablo</div>
+          <div class="ak-rl">AGENTE IA &middot; Akasha Brain</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:9px;color:rgba(255,255,255,.3);font-family:var(--m)">VOZ</span>
+          <input type="checkbox" id="voz-toggle" style="width:auto;padding:0;cursor:pointer;accent-color:var(--g2)"/>
+        </div>
+      </div>
+      <div class="ak-st">
+        <span id="sem-dot" class="semaforo sem-verde"></span>
+        <span id="sem-lbl" style="font-family:var(--m)">INICIANDO NÚCLEO...</span>
+      </div>
+      <div id="chat-msgs">
+        <div style="display:flex">
+          <div class="chat-bbl-a">&#127807; <b>Juan Pablo</b> &mdash; Agente Jefe Agrónomo.<br/><br/>Conectado a la telemetría de Stella Maris. ¿Qué pasillo auditamos hoy?</div>
+        </div>
+      </div>
+      <div id="qpanel">
+        <button class="qbtn" onclick="quickAsk('Dime las métricas del robot en el pasillo 1I')">ROBOT</button>
+        <button class="qbtn" onclick="quickAsk('¿Hay riesgo de hongos por humedad alta?')">HONGOS</button>
+      </div>
+      <div class="ak-in">
+        <div class="ak-inrow">
+          <input id="chat-input" type="text" placeholder="Pregunta a Juan Pablo..." style="flex:1;font-size:12px;padding:8px;border-radius:7px;font-family:var(--m)" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="ak-send" id="chat-send-btn" onclick="sendChat()">&#10148;</button>
+          <button class="ak-mic" id="voz-mic" onclick="toggleVoiceInput()">&#127908;</button>
+        </div>
+        <div id="stt-lbl" class="stt-st">ESCUCHANDO...</div>
+      </div>
+    </div>
+  </div></div>```
+
+---
+
+### PARTE 8: Modales y Configuración Inicial (JavaScript)
+*Va justo después de la Parte 7. Empezamos la lógica.*
+
+```html
+<div id="pov" class="pov" onclick="closePanel()"></div>
+<div id="hm-modal" class="modal-bg">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;font-family:var(--m)">MAPA DE CALOR IDW</div>
+      <button onclick="closeHM()" class="btn bxs">X</button>
+    </div>
+    <canvas id="hm-cv" style="width:100%;border-radius:8px;display:block;border:1px solid var(--line)"></canvas>
+  </div>
+</div>
+
+<script>
+// ══════ CONFIG & VARIABLES ══════
+var uRole='admin', curUserName='Juan Pablo Moreno', curClienteId='f0001';
+var CFG={
+  supa:'https://crfghwtfqaplzsmwylxe.supabase.co',
+  anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64',
+  voiceId:'21m00Tcm4TlvDq8ikWAM',
+  chatUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-chat',
+  voiceUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-voice',
+  actionsUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-actions'
+};
+var chatHist=[], curView='he', curSlot=3, curVk='temp_aire', curTipo='inv', curZone='1I';
+var selZ={}, robMode='auto', robActive=false, MC={};
+var curSt={n:'Invernadero 01',f:7,c:2,zn:14,cult:'Tomate Cherry',sem:8,tipo:'inv'};
+var _sid='s_'+Math.random().toString(36).substr(2,9);
+for(var _ri=1;_ri<=7;_ri++){selZ[_ri+'I']=true;selZ[_ri+'D']=true;}
+
+var VRS={
+  temp_aire:{l:'Temp Aire',u:'C',ic:'TMP',mn:16,mx:38,on:20,ox:30,c:['#0ea5e9','#22c55e','#fbbf24','#f97316','#ef4444'],tipos:['inv','cm','ca']},
+  hum_aire:{l:'Hum Aire',u:'%',ic:'HUM',mn:40,mx:95,on:60,ox:82,c:['#3b82f6','#06b6d4','#22c55e','#fbbf24','#ef4444'],tipos:['inv','cm','ca']},
+  co2_ppm:{l:'CO2',u:'ppm',ic:'CO2',mn:380,mx:900,on:420,ox:750,c:['#22c55e','#84cc16','#fbbf24','#f97316','#ef4444'],tipos:['inv','cm']},
+  ch4_ppm:{l:'Metano',u:'ppm',ic:'CH4',mn:0,mx:50,on:0,ox:5,c:['#22c55e','#84cc16','#fbbf24','#f97316','#ef4444'],tipos:['inv','cm','ca']}
+};
+var SB={3:{temp_aire:30,hum_aire:64,co2_ppm:610,ch4_ppm:2.5}};
+var ALOG=[]; 
+
+function rnd(n){return(Math.random()-.5)*2*n;}
+function hR(h){var m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?[parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]:null;}
+function gC(v,vk,a){var c=VRS[vk];if(!c)return'#888';var t=Math.max(0,Math.min(1,(v-c.mn)/(c.mx-c.mn)));var cs=c.c,n=cs.length,sg=(n-1)*t,i=Math.min(Math.floor(sg),n-2),f=sg-i;var c1=hR(cs[i]),c2=hR(cs[i+1]);return'rgba('+Math.round(c1[0]+f*(c2[0]-c1[0]))+','+Math.round(c1[1]+f*(c2[1]-c1[1]))+','+Math.round(c1[2]+f*(c2[2]-c1[2]))+','+(a||.88)+')';}
+function fmt(v){return(+v).toFixed(v<1?3:1);}
+function gSt(v,vk){var c=VRS[vk];if(!c)return'ok';return(v>c.mx||v<c.mn)?'crit':(v>c.ox||v<c.on)?'warn':'ok';}
+function sCl(s){return s==='crit'?'var(--cr)':s==='warn'?'var(--wn)':'var(--ok)';}
+function avg(a){return a.length?a.reduce((s,v)=>s+v,0)/a.length:0;}
+function idw(pts,gx,gy){var n=0,d=0;for(var i=0;i<pts.length;i++){var dx=gx-pts[i].x,dy=gy-pts[i].y,d2=dx*dx+dy*dy;if(d2<.01)return pts[i].v;var w=1/d2;n+=w*pts[i].v;d+=w;}return d?n/d:null;}
+   function gM(slot,z,tipo,f){
+  var k=(slot||3)+'-'+(z||'1.2')+'-'+(tipo||curTipo)+'-'+(f||curSt.f);
+  if(MC[k])return MC[k];
+  var base=SB[slot||3]||SB[3],fi=f||curSt.f||7,xs=[1.8,5.2,16.3,19.7],pts=[];
+  for(var r=1;r<=fi;r++){
+    var yc=(r-1)*37+18,sf=Math.sin((r/fi)*Math.PI);
+    for(var xi=0;xi<xs.length;xi++){
+      var p={x:xs[xi]+rnd(.4),y:yc+rnd(3)};
+      for(var vk in VRS)p[vk]=+(+(base[vk]||1)+sf*3*(vk==='temp_aire'?1:-.3)+rnd((base[vk]||1)*.09)).toFixed(3);
+      pts.push(p);
+    }
+  }
+  return MC[k]=pts;
+}
+
+// ══════ AUDITORIA (CORREGIDO) ══════
+var SUPA_HEADERS={'apikey':CFG.anonKey,'Authorization':'Bearer '+CFG.anonKey,'Content-Type':'application/json'};
+
+function aAudit(usr,acc,mod,obj){
+  var ts=new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+  ALOG.unshift({ts:ts,usr:usr,acc:acc,mod:mod,obj:obj});
+  if(ALOG.length>50)ALOG.pop();
+  buildAudit();
+  
+  if(typeof SUPA_HEADERS!=='undefined'){
+    (async function(){try{
+      await fetch(CFG.supa+'/rest/v1/menv_auditoria',{
+        method:'POST',
+        headers:Object.assign({},SUPA_HEADERS,{'Prefer':'return=minimal'}),
+        body:JSON.stringify({usuario:usr,accion:acc,modulo:mod,objeto:obj,ts:new Date().toISOString()})
+      });
+    }catch(e){}}());
+  }
+}
+
+function buildAudit(){
+  var e=document.getElementById('au-tb');if(!e)return;e.innerHTML='';
+  ALOG.slice(0,20).forEach(a=>e.innerHTML+='<tr><td>'+a.ts+'</td><td>'+a.usr+'</td><td>'+a.acc+'</td><td>'+a.mod+'</td><td>'+a.obj+'</td></tr>');
+}
+   // ══════ JUAN PABLO — VOZ Y CHAT (CORREGIDO ASYNC DUPLICADO) ══════
+async function greetVoice(name){
+  var txt='Hola '+name+'. Soy Juan Pablo. Agente conectado.';
+  try{
+    var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,voice_id:CFG.voiceId})});
+    if(r.ok){var blob=await r.blob();new Audio(URL.createObjectURL(blob)).play();}
+  }catch(e){console.log('Voz:',e.message);}
+}
+
+async function loadSystemStatus(){
+  try{
+    var r=await fetch(CFG.actionsUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get_system_status',tenant_id:'hidroexpo'})});
+    var d=await r.json();
+    var dot=document.getElementById('sem-dot'),lbl=document.getElementById('sem-lbl');
+    if(dot&&lbl){
+      var sem=d.semaforo||'verde';dot.className='semaforo sem-'+sem;
+      lbl.textContent=(sem==='verde'?'SYS OK':sem==='amarillo'?'ATENCION':'CRITICO')+' · '+(d.alertas_activas||0)+' ALERTAS';
+    }
+  }catch(e){}
+}
+
+async function sendChat(){
+  var inp=document.getElementById('chat-input'),btn=document.getElementById('chat-send-btn');
+  var msg=inp.value.trim();if(!msg)return;
+  inp.value='';if(btn)btn.disabled=true;
+  
+  var area=document.getElementById('chat-msgs');
+  area.innerHTML+='<div style="display:flex;justify-content:flex-end"><div class="chat-bbl-u">'+msg+'</div></div>';
+  area.scrollTop=area.scrollHeight;
+  
+  try{
+    var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,tenant_id:'hidroexpo',session_id:_sid})});
+    var d=await r.json();
+    area.innerHTML+='<div style="display:flex"><div class="chat-bbl-a">'+d.reply+'</div></div>';
+    area.scrollTop=area.scrollHeight;
+  }catch(e){
+    area.innerHTML+='<div style="display:flex"><div class="chat-bbl-a">Error de conexión con el cerebro Akasha.</div></div>';
+  }
+  if(btn)btn.disabled=false;
+}
+
+function quickAsk(m){document.getElementById('chat-input').value=m;sendChat();}
+function toggleVoiceInput(){alert("La API de reconocimiento de voz requiere entorno seguro HTTPS.");}
+
+// ══════ NAVEGACION Y UI ══════
+function shView(id){
+  ['v-he','v-st','v-zn','v-db'].forEach(v=>{var e=document.getElementById(v);if(e){e.style.display='none';e.classList.remove('active');}});
+  var el=document.getElementById(id);if(el){el.style.display=(id==='v-db'?'flex':'block');el.classList.add('active');curView=id.replace('v-','');}
+}
+function toggleSec(id){var e=document.getElementById(id);if(e)e.style.display=e.style.display==='none'?'grid':'none';}
+function showDT(id,b){
+  document.querySelectorAll('[id^="dt-"].tab-pane').forEach(e=>{e.classList.remove('active');e.style.display='none';});
+  document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
+  var el=document.getElementById(id);if(el){el.classList.add('active');el.style.display='block';}
+  if(b)b.classList.add('active');
+}
+function setRM(m){robMode=m;['auto','manual'].forEach(x=>{var b=document.getElementById('rm-'+x);if(b)b.className='btn '+(x===m?'btp':'bto')+' bsm';});}
+
+function startRobot(){
+  if(robActive)return;robActive=true;
+  var b=document.getElementById('rob-btn');if(b)b.textContent='EN PROGRESO...';
+  document.getElementById('rob-pg').style.display='block';
+  var z=Object.keys(selZ), idx=0;
+  function p(){
+    if(idx>=z.length){
+      document.getElementById('rob-lb').textContent='COMPLETADO';
+      if(b)b.textContent='INICIAR NUEVO RECORRIDO';
+      robActive=false;return;
+    }
+    var pct=Math.round((idx/z.length)*100);
+    document.getElementById('rob-pc').textContent=pct+'%';
+    document.getElementById('rob-br').style.width=pct+'%';
+    idx++;setTimeout(p, 400);
+  }
+  p();
+}
+
+// ══════ LOGIN (CORREGIDO LBTN) ══════
+async function doLogin(){
+  var u=document.getElementById('l-u').value.trim().toLowerCase();
+  var p=document.getElementById('l-p').value.trim();
+  var btn=document.querySelector('#s-login .lbtn'); // Fix lbtn
+  if(btn){btn.textContent='Verificando...';btn.disabled=true;}
+  
+  if((u==='admin@agrosense.co'||u==='admin')&&p==='agro2026'){
+    document.getElementById('s-login').classList.remove('active');
+    document.getElementById('s-app').classList.add('active');
+    aAudit('Juan Pablo Moreno','LOGIN','Sistema','AGROSENSe Pro v11.5');
+    initApp();
+  } else {
+    var err=document.getElementById('l-err');err.style.display='block';
+    setTimeout(()=>err.style.display='none',3000);
+    if(btn){btn.textContent='INGRESAR →';btn.disabled=false;}
+  }
+}
+function doLogout(){document.getElementById('s-app').classList.remove('active');document.getElementById('s-login').classList.add('active');}
+
+function initApp(){
+  ['si','scm','sca'].forEach(id=>{
+    var e=document.getElementById(id);
+    if(e)for(var i=1;i<=12;i++)e.innerHTML+='<div class="sbox ok" onclick="shView(\'v-st\')"><div>&#127911;</div><div>Z-'+i+'</div></div>';
+  });
+  setTimeout(loadSystemStatus, 1500);
+}
+</script>
+</body>
+</html>
