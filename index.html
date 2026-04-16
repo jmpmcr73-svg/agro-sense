@@ -529,7 +529,7 @@ function doLogin(){
   var u=document.getElementById("l-u").value.trim(),p=document.getElementById("l-p").value.trim(),ok=false;
   if((u==="admin@agrosense.co"||u==="admin")&&p==="agro2026"){ok=true;uRole="admin";}
   else if(u==="productor@agrosense.co"&&p==="agro2026"){ok=true;uRole="productor";}
-  if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();setTimeout(function(){greetVoice(curUserName);},900);loadQuickPrompts();loadSystemStatus();}
+  if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();setTimeout(function(){if(typeof greetVoice==="function")greetVoice(curUserName);},900);}
   else document.getElementById("l-err").style.display="block";
 }
 function doLogout(){document.getElementById("s-app").classList.remove("active");document.getElementById("s-login").classList.add("active");}
@@ -984,18 +984,133 @@ function closePanel(){document.querySelectorAll(".side-panel").forEach(function(
 
 window.addEventListener("resize",function(){drawSVC();drawDBCV();buildRobCV();var mp=document.getElementById("dt-mapa"),gf=document.getElementById("dt-graf");if(mp&&mp.classList.contains("active"))redrawMap();if(gf&&gf.classList.contains("active"))drawCharts();});
 
-async function greetVoice(n){var vc=document.getElementById('voz-toggle');if(vc&&!vc.checked)return;var t='¡Hola '+n+'! Bienvenido a iAgri AGROSENSe Pro. Soy Akasha, tu asistente agrícola. ¿En qué puedo ayudarte?';try{var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,voice_id:CFG.voiceId})});if(r.ok){var b=await r.blob();new Audio(URL.createObjectURL(b)).play();}}catch(e){}}
-async function loadSystemStatus(){try{var r=await fetch(CFG.actionsUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get_system_status',tenant_id:'hidroexpo'})});var d=await r.json();var dot=document.getElementById('sem-dot'),lbl=document.getElementById('sem-lbl');if(!dot||!lbl)return;var s=d.semaforo||'verde';dot.className='semaforo sem-'+s;lbl.textContent=(s==='verde'?'✅':s==='amarillo'?'⚠️':'🔴')+' '+(d.alertas_activas||0)+' alertas · '+(d.agentes_activos||0)+' agentes';}catch(e){}}
-async function loadQuickPrompts(){try{var r=await fetch(CFG.actionsUrl+'?action=get_quick_prompts&org_id=hidroexpo');var d=await r.json();if(!d.prompts||!d.prompts.length)return;var p=document.getElementById('qpanel');if(!p)return;p.innerHTML=d.prompts.slice(0,6).map(function(q){return'<button class="qbtn" onclick="quickAsk('+JSON.stringify(q.prompt)+')">'+(q.emoji||'💬')+' '+q.label+'</button>';}).join('');}catch(e){}}
-function getStatsCtx(){try{var ms=gM(curSlot,'1.2');function ga(v){return avg(ms.map(function(m){return m[v]||0;})).toFixed(2);}var al=ALERTS_D.filter(function(a){return!a.ok;}).map(function(a){return a.msg;}).slice(0,3).join('; ');return 'Estructura:'+curSt.n+' Cultivo:'+curSt.cult+' Sem:'+curSt.sem+' Temp='+ga('temp_aire')+'C Hum='+ga('hum_aire')+'% CO2='+ga('co2_ppm')+'ppm CH4='+ga('ch4_ppm')+'ppm Etileno='+ga('etileno_ppm')+'ppm HumSust='+ga('hum_sustrato')+'% CE='+ga('ce_sustrato')+'mS/cm'+(al?' Alertas:'+al:'');}catch(e){return '';}}
-async function sendChat(){var inp=document.getElementById('chat-input'),btn=document.getElementById('chat-send-btn'),msg=inp.value.trim();if(!msg)return;inp.value='';if(btn)btn.disabled=true;addChatMsg(msg,'user');showTyping();var t0=Date.now();try{var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,stats_context:getStatsCtx(),history:chatHist.slice(-8),tenant_id:'hidroexpo',session_id:_sessionId})});var d=await r.json();hideTyping();var rep=d.reply||'Sin respuesta.';if(d.correlData&&d.correlData.pares&&d.correlData.pares.length>0){var ct='\n\n📊 Correlaciones:\n';d.correlData.pares.slice(0,4).forEach(function(p){if(p.correlacion!=null)ct+='• '+p.variable_x+' ↔ '+p.variable_y+': r='+p.correlacion+' ('+p.fuerza+')\n';});rep+=ct;}var ms=Date.now()-t0;addChatMsg(rep,'akasha',ms,d.model);chatHist.push({role:'user',content:msg});chatHist.push({role:'assistant',content:rep});aAudit(curUserName,'chat_akasha','💬 Chat',msg.substring(0,40));var vt=document.getElementById('voz-toggle');if(vt&&vt.checked){try{var vr=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:rep.replace(/[
-📊🌱🌿⚠️✅🧪💬👋📡]/g,' ').substring(0,300),voice_id:CFG.voiceId})});if(vr.ok){var vb=await vr.blob();new Audio(URL.createObjectURL(vb)).play();}}catch(ve){}}loadSystemStatus();}catch(e){hideTyping();addChatMsg('⚠️ Error: '+e.message,'akasha');}finally{if(btn)btn.disabled=false;inp.focus();}}
-function quickAsk(msg){document.getElementById('chat-input').value=msg;sendChat();var p=document.getElementById('agent-panel');if(!p.classList.contains('open'))togglePanel('agent-panel');}
-function addChatMsg(txt,who,ms,model){var a=document.getElementById('chat-msgs');if(!a)return;var w=document.createElement('div');w.style.cssText='display:flex;flex-direction:column;'+(who==='user'?'align-items:flex-end':'');var d=document.createElement('div');d.className=who==='user'?'chat-bbl-u':'chat-bbl-a';d.innerHTML=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/
-/g,'<br/>');w.appendChild(d);if(who==='akasha'&&ms){var m=document.createElement('div');m.className='chat-meta';m.textContent=(model||'akasha')+' · '+ms+'ms';w.appendChild(m);}a.appendChild(w);a.scrollTop=a.scrollHeight;}
-function showTyping(){var a=document.getElementById('chat-msgs');if(!a)return;var d=document.createElement('div');d.id='typing-ind';d.innerHTML='<div style="display:flex;align-items:center;gap:3px;padding:8px 12px;background:#f8fafc;border-radius:12px 12px 12px 4px;border:1px solid var(--border)"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';a.appendChild(d);a.scrollTop=a.scrollHeight;}
+
+// ── AKASHA v5 LIMPIO ──
+async function greetVoice(name){
+  var vc=document.getElementById('voz-toggle');
+  if(vc&&!vc.checked)return;
+  var txt='\u00a1Hola '+name+'! Soy Akasha, tu asistente de iAGRI.';
+  try{
+    var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,voice_id:CFG.voiceId})});
+    if(r.ok){var blob=await r.blob();new Audio(URL.createObjectURL(blob)).play();}
+  }catch(e){console.log('Voice:',e);}
+}
+async function loadSystemStatus(){
+  try{
+    var r=await fetch(CFG.actionsUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get_system_status',tenant_id:'hidroexpo'})});
+    var d=await r.json();
+    var dot=document.getElementById('sem-dot');
+    var lbl=document.getElementById('sem-lbl');
+    if(!dot||!lbl)return;
+    var sem=d.semaforo||'verde';
+    dot.className='semaforo sem-'+sem;
+    lbl.textContent=(sem==='verde'?'\u2705':sem==='amarillo'?'\u26a0\ufe0f':'\ud83d\udd34')+' '+(d.alertas_activas||0)+' alertas';
+  }catch(e){}
+}
+async function loadQuickPrompts(){
+  try{
+    var r=await fetch(CFG.actionsUrl+'?action=get_quick_prompts&org_id=hidroexpo');
+    var d=await r.json();
+    if(!d.prompts||!d.prompts.length)return;
+    var panel=document.getElementById('qpanel');
+    if(!panel)return;
+    panel.innerHTML=d.prompts.slice(0,6).map(function(p){return '<button class="qbtn" onclick="quickAsk('+JSON.stringify(p.prompt)+')">'+(p.emoji||'\ud83d\udcac')+' '+p.label+'</button>';}).join('');
+  }catch(e){}
+}
+function getStatsCtx(){
+  try{
+    var ms=gM(curSlot,'1.2');
+    function ga(vk){return avg(ms.map(function(m){return m[vk]||0;})).toFixed(2);}
+    var alts=ALERTS_D.filter(function(a){return!a.ok;}).map(function(a){return a.msg;}).slice(0,3).join('; ');
+    return 'Temp='+ga('temp_aire')+'C Hum='+ga('hum_aire')+'% CO2='+ga('co2_ppm')+'ppm'+(alts?' Alertas:'+alts:'');
+  }catch(e){return '';}
+}
+async function sendChat(){
+  var inp=document.getElementById('chat-input');
+  var btn=document.getElementById('chat-send-btn');
+  var msg=inp.value.trim();if(!msg)return;
+  inp.value='';if(btn)btn.disabled=true;
+  addChatMsg(msg,'user');showTyping();
+  var t0=Date.now();
+  try{
+    var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,stats_context:getStatsCtx(),history:chatHist.slice(-8),tenant_id:'hidroexpo',session_id:_sessionId})});
+    var d=await r.json();
+    hideTyping();
+    var reply=d.reply||'Sin respuesta.';
+    if(d.correlData&&d.correlData.pares&&d.correlData.pares.length>0){
+      var ct='\n\n\ud83d\udcca Correlaciones:\n';
+      d.correlData.pares.slice(0,4).forEach(function(p){if(p.correlacion!=null)ct+='\u2022 '+p.variable_x+' \u2192 '+p.variable_y+': r='+p.correlacion+' ('+p.fuerza+')\n';});
+      reply+=ct;
+    }
+    var elapsed=Date.now()-t0;
+    addChatMsg(reply,'akasha',elapsed,d.model);
+    chatHist.push({role:'user',content:msg});
+    chatHist.push({role:'assistant',content:reply});
+    aAudit(curUserName,'chat_akasha','\ud83d\udcac Chat',msg.substring(0,40));
+    var vt=document.getElementById('voz-toggle');
+    if(vt&&vt.checked){
+      try{
+        var cleanReply=reply.split('').filter(function(c){var cc=c.charCodeAt(0);return cc<55296||cc>57343;}).join('').replace(/[\r\n]+/g,' ').substring(0,300);
+        var vr=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:cleanReply,voice_id:CFG.voiceId})});
+        if(vr.ok){var vb=await vr.blob();new Audio(URL.createObjectURL(vb)).play();}
+      }catch(ve){}
+    }
+    if(typeof loadSystemStatus==='function')loadSystemStatus();
+  }catch(e){hideTyping();addChatMsg('\u26a0\ufe0f Error: '+e.message,'akasha');}
+  finally{if(btn)btn.disabled=false;inp.focus();}
+}
+function quickAsk(msg){
+  document.getElementById('chat-input').value=msg;sendChat();
+  var p=document.getElementById('agent-panel');
+  if(p&&!p.classList.contains('open'))togglePanel('agent-panel');
+}
+function addChatMsg(txt,who,ms,model){
+  var area=document.getElementById('chat-msgs');if(!area)return;
+  var wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;'+(who==='user'?'align-items:flex-end':'');
+  var d=document.createElement('div');
+  d.className=who==='user'?'chat-bbl-u':'chat-bbl-a';
+  var esc=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var lines=esc.split('\n');d.innerHTML=lines.join('<br/>');
+  wrap.appendChild(d);
+  if(who==='akasha'&&ms){
+    var meta=document.createElement('div');meta.className='chat-meta';
+    meta.textContent=(model||'akasha')+' \u00b7 '+ms+'ms';
+    wrap.appendChild(meta);
+  }
+  area.appendChild(wrap);area.scrollTop=area.scrollHeight;
+}
+function showTyping(){
+  var area=document.getElementById('chat-msgs');if(!area)return;
+  var d=document.createElement('div');d.id='typing-ind';
+  d.innerHTML='<div style="display:flex;align-items:center;gap:3px;padding:8px 12px;background:#f8fafc;border-radius:12px;border:1px solid var(--border)"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';
+  area.appendChild(d);area.scrollTop=area.scrollHeight;
+}
 function hideTyping(){var t=document.getElementById('typing-ind');if(t)t.remove();}
-function toggleVoiceInput(){var btn=document.getElementById('voz-mic'),lbl=document.getElementById('stt-lbl');if(!window.SpeechRecognition&&!window.webkitSpeechRecognition){alert('Requiere Chrome o Edge.');return;}if(btn.classList.contains('active')){if(window._aRec)window._aRec.stop();btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');return;}var SR=window.SpeechRecognition||window.webkitSpeechRecognition;window._aRec=new SR();window._aRec.lang='es-ES';window._aRec.continuous=false;window._aRec.interimResults=false;window._aRec.onresult=function(e){document.getElementById('chat-input').value=e.results[0][0].transcript;btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');sendChat();};window._aRec.onend=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};window._aRec.onerror=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};window._aRec.start();btn.classList.add('active');btn.textContent='⏹';if(lbl)lbl.classList.add('vis');}
+function toggleVoiceInput(){
+  var btn=document.getElementById('voz-mic');
+  var lbl=document.getElementById('stt-lbl');
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Requiere Chrome o Edge.');return;}
+  if(btn.classList.contains('active')){
+    if(window._aRec)window._aRec.stop();
+    btn.classList.remove('active');btn.textContent='\ud83c\udfa4';
+    if(lbl)lbl.classList.remove('vis');return;
+  }
+  window._aRec=new SR();
+  window._aRec.lang='es-ES';
+  window._aRec.continuous=false;
+  window._aRec.interimResults=false;
+  window._aRec.onresult=function(e){
+    var t=e.results[0][0].transcript;
+    document.getElementById('chat-input').value=t;
+    btn.classList.remove('active');btn.textContent='\ud83c\udfa4';
+    if(lbl)lbl.classList.remove('vis');sendChat();
+  };
+  window._aRec.onend=function(){btn.classList.remove('active');btn.textContent='\ud83c\udfa4';if(lbl)lbl.classList.remove('vis');};
+  window._aRec.onerror=function(){btn.classList.remove('active');btn.textContent='\ud83c\udfa4';if(lbl)lbl.classList.remove('vis');};
+  window._aRec.start();btn.classList.add('active');btn.textContent='\u23f9';if(lbl)lbl.classList.add('vis');
+}
 </script>
 </body>
 </html>
