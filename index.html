@@ -89,6 +89,21 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .bci:hover{background:var(--greenl);color:var(--green)}
 .bci.active{color:var(--green);font-weight:700}
 .bcs{color:var(--text3);font-size:10px}
+.chat-bbl-u{background:#dcfce7;border-radius:12px 12px 4px 12px;padding:8px 12px;font-size:12px;max-width:82%;color:#15803d;word-break:break-word}
+.chat-bbl-a{background:#f8fafc;border-radius:12px 12px 12px 4px;padding:8px 12px;font-size:12px;max-width:85%;border:1px solid var(--border);color:var(--text);word-break:break-word}
+.chat-meta{font-size:9px;color:var(--text3);margin-top:3px;text-align:right}
+.typing-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green2);animation:pulse 1.2s infinite;margin:0 2px}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+.chat-send-btn{flex-shrink:0;border:none;background:var(--green);color:#fff;padding:7px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.chat-send-btn:disabled{opacity:.5;cursor:not-allowed}
+.chat-mic-btn{flex-shrink:0;border:1.5px solid var(--border);background:#fff;padding:7px 10px;border-radius:8px;font-size:13px;cursor:pointer}
+.chat-mic-btn.active{background:var(--redl);border-color:var(--redb)}
+.stt-status{display:none;font-size:10px;color:var(--green);padding:2px 7px;background:var(--greenl);border-radius:5px;border:1px solid var(--greenb)}
+.stt-status.vis{display:inline-block}
+.qbtn{font-size:9px;padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text2);white-space:nowrap;transition:all .15s}
+.qbtn:hover{border-color:var(--green2);background:var(--greenl);color:var(--green)}
+.semaforo{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px;flex-shrink:0}
+.sem-verde{background:#22c55e}.sem-amarillo{background:#f59e0b}.sem-rojo{background:#ef4444;animation:pulse 1s infinite}
 </style>
 </head>
 <body>
@@ -398,17 +413,30 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <span class="badge bok" style="margin-top:4px">🟢 En línea</span>
     </div>
   </div>
-  <div style="padding:14px">
-    <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:10px">Resumen del Sistema</div>
-    <div id="ag-st" style="display:flex;flex-direction:column;gap:6px"></div>
-    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
-      <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px">Módulos iAGRI</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <div class="badge bok" style="justify-content:flex-start;padding:6px 10px">✅ AGROSENSe · Activo</div>
-        <div class="badge bin" style="justify-content:flex-start;padding:6px 10px">🔄 NOC Local · Sync OK</div>
-        <div class="badge bok" style="justify-content:flex-start;padding:6px 10px">✅ Supabase iAGRI · Conectado</div>
-        <div class="badge bwn" style="justify-content:flex-start;padding:6px 10px">⏳ WhatsApp · Pendiente</div>
-        <div class="badge bwn" style="justify-content:flex-start;padding:6px 10px">⏳ App Stores · Pendiente</div>
+  <div style="padding:10px 14px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span class="semaforo sem-verde" id="sem-dot"></span><div style="font-size:12px;font-weight:700;color:var(--green)">Resumen del Sistema</div><span id="sem-lbl" style="font-size:9px;color:var(--text3);margin-left:auto">cargando...</span></div>
+    <div id="ag-st" style="display:flex;flex-direction:column;gap:5px"></div>
+    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px"><div class="badge bok" style="padding:3px 7px">✅ AGROSENSe</div><div class="badge bin" style="padding:3px 7px">🔄 NOC OK</div><div class="badge bok" style="padding:3px 7px">✅ Supabase</div><div class="badge bok" style="padding:3px 7px">✅ WhatsApp</div></div>
+  </div>
+  <div style="border-top:1.5px solid var(--border);display:flex;flex-direction:column">
+    <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:12px;font-weight:700;color:var(--green)">💬 Akasha IA</div>
+      <div style="display:flex;align-items:center;gap:6px"><span id="stt-lbl" class="stt-status">🎤 Escuchando...</span><span style="font-size:10px;color:var(--text2)">🔊</span><input type="checkbox" id="voz-toggle" style="width:auto;padding:0" title="Voz"/></div>
+    </div>
+    <div id="chat-msgs" style="overflow-y:auto;padding:0 10px 8px;display:flex;flex-direction:column;gap:6px;min-height:160px;max-height:300px">
+      <div style="display:flex"><div class="chat-bbl-a">👋 ¡Hola! Soy Akasha. Pregúntame sobre alertas, sensores, correlaciones o agronomía.</div></div>
+    </div>
+    <div style="padding:7px 10px;border-top:1px solid var(--border);background:#fafcfa">
+      <div style="display:flex;gap:5px;margin-bottom:5px">
+        <input id="chat-input" type="text" placeholder="Pregunta a Akasha..." style="flex:1;font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()"/>
+        <button class="chat-send-btn" id="chat-send-btn" onclick="sendChat()">→</button>
+        <button class="chat-mic-btn" id="voz-mic" onclick="toggleVoiceInput()" title="Voz">🎤</button>
+      </div>
+      <div id="qpanel" style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="qbtn" onclick="quickAsk('¿Qué alertas activas hay ahora?')">⚠️ Alertas</button>
+        <button class="qbtn" onclick="quickAsk('Dame los KPIs del día.')">📊 KPIs</button>
+        <button class="qbtn" onclick="quickAsk('Correlación temperatura y etileno.')">🧪 Correl.</button>
+        <button class="qbtn" onclick="quickAsk('¿Cuándo regar según el sustrato?')">💧 Riego</button>
       </div>
     </div>
   </div>
@@ -430,6 +458,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   </div>
 </div>
 <script>
+var CFG={supa:'https://crfghwtfqaplzsmwylxe.supabase.co',anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64',voiceId:'21m00Tcm4TlvDq8ikWAM',actionsUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-actions',chatUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-chat',voiceUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-voice'};
+var chatHist=[];var curUserName='';var _sessionId='sess_'+Math.random().toString(36).substr(2,9)+'_'+Date.now();
 var VRS={
   temp_aire:{l:"Temp Aire",u:"°C",ic:"🌡",mn:16,mx:38,on:20,ox:30,c:["#0ea5e9","#22c55e","#fbbf24","#f97316","#ef4444"],tipos:["inv","cm","ca"]},
   hum_aire:{l:"Hum Aire",u:"%RH",ic:"💧",mn:40,mx:95,on:60,ox:82,c:["#3b82f6","#06b6d4","#22c55e","#fbbf24","#ef4444"],tipos:["inv","cm","ca"]},
@@ -486,7 +516,7 @@ function doLogin(){
   var u=document.getElementById("l-u").value.trim(),p=document.getElementById("l-p").value.trim(),ok=false;
   if((u==="admin@agrosense.co"||u==="admin")&&p==="agro2026"){ok=true;uRole="admin";}
   else if(u==="productor@agrosense.co"&&p==="agro2026"){ok=true;uRole="productor";}
-  if(ok){document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(uRole==="admin"?"Juan Pablo":"Carlos","login","Sistema","AGROSENSe Pro");initApp();}
+  if(ok){curUserName=uRole==="admin"?"Juan Pablo":"Carlos";document.getElementById("s-login").classList.remove("active");document.getElementById("s-app").classList.add("active");aAudit(curUserName,"login","Sistema","AGROSENSe Pro");initApp();setTimeout(function(){greetVoice(curUserName);},900);loadQuickPrompts();loadSystemStatus();}
   else document.getElementById("l-err").style.display="block";
 }
 function doLogout(){document.getElementById("s-app").classList.remove("active");document.getElementById("s-login").classList.add("active");}
@@ -930,6 +960,23 @@ function togglePanel(id){var p=document.getElementById(id),ov=document.getElemen
 function closePanel(){document.querySelectorAll(".side-panel").forEach(function(p){p.classList.remove("open");});var ov=document.getElementById("pov");if(ov)ov.classList.remove("open");}
 
 window.addEventListener("resize",function(){drawSVC();drawDBCV();buildRobCV();var mp=document.getElementById("dt-mapa"),gf=document.getElementById("dt-graf");if(mp&&mp.classList.contains("active"))redrawMap();if(gf&&gf.classList.contains("active"))drawCharts();});
+
+async function greetVoice(n){var vc=document.getElementById('voz-toggle');if(vc&&!vc.checked)return;var t='¡Hola '+n+'! Bienvenido a iAgri AGROSENSe Pro. Soy Akasha, tu asistente agrícola. ¿En qué puedo ayudarte?';try{var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t,voice_id:CFG.voiceId})});if(r.ok){var b=await r.blob();new Audio(URL.createObjectURL(b)).play();}}catch(e){}}
+async function loadSystemStatus(){try{var r=await fetch(CFG.actionsUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get_system_status',tenant_id:'hidroexpo'})});var d=await r.json();var dot=document.getElementById('sem-dot'),lbl=document.getElementById('sem-lbl');if(!dot||!lbl)return;var s=d.semaforo||'verde';dot.className='semaforo sem-'+s;lbl.textContent=(s==='verde'?'✅':s==='amarillo'?'⚠️':'🔴')+' '+(d.alertas_activas||0)+' alertas · '+(d.agentes_activos||0)+' agentes';}catch(e){}}
+async function loadQuickPrompts(){try{var r=await fetch(CFG.actionsUrl+'?action=get_quick_prompts&org_id=hidroexpo');var d=await r.json();if(!d.prompts||!d.prompts.length)return;var p=document.getElementById('qpanel');if(!p)return;p.innerHTML=d.prompts.slice(0,6).map(function(q){return'<button class="qbtn" onclick="quickAsk('+JSON.stringify(q.prompt)+')">'+(q.emoji||'💬')+' '+q.label+'</button>';}).join('');}catch(e){}}
+function getStatsCtx(){try{var ms=gM(curSlot,'1.2');function ga(v){return avg(ms.map(function(m){return m[v]||0;})).toFixed(2);}var al=ALERTS_D.filter(function(a){return!a.ok;}).map(function(a){return a.msg;}).slice(0,3).join('; ');return 'Estructura:'+curSt.n+' Cultivo:'+curSt.cult+' Sem:'+curSt.sem+' Temp='+ga('temp_aire')+'C Hum='+ga('hum_aire')+'% CO2='+ga('co2_ppm')+'ppm CH4='+ga('ch4_ppm')+'ppm Etileno='+ga('etileno_ppm')+'ppm HumSust='+ga('hum_sustrato')+'% CE='+ga('ce_sustrato')+'mS/cm'+(al?' Alertas:'+al:'');}catch(e){return '';}}
+async function sendChat(){var inp=document.getElementById('chat-input'),btn=document.getElementById('chat-send-btn'),msg=inp.value.trim();if(!msg)return;inp.value='';if(btn)btn.disabled=true;addChatMsg(msg,'user');showTyping();var t0=Date.now();try{var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,stats_context:getStatsCtx(),history:chatHist.slice(-8),tenant_id:'hidroexpo',session_id:_sessionId})});var d=await r.json();hideTyping();var rep=d.reply||'Sin respuesta.';if(d.correlData&&d.correlData.pares&&d.correlData.pares.length>0){var ct='
+
+📊 Correlaciones:
+';d.correlData.pares.slice(0,4).forEach(function(p){if(p.correlacion!=null)ct+='• '+p.variable_x+' ↔ '+p.variable_y+': r='+p.correlacion+' ('+p.fuerza+')
+';});rep+=ct;}var ms=Date.now()-t0;addChatMsg(rep,'akasha',ms,d.model);chatHist.push({role:'user',content:msg});chatHist.push({role:'assistant',content:rep});aAudit(curUserName,'chat_akasha','💬 Chat',msg.substring(0,40));var vt=document.getElementById('voz-toggle');if(vt&&vt.checked){try{var vr=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:rep.replace(/[
+📊🌱🌿⚠️✅🧪💬👋📡]/g,' ').substring(0,300),voice_id:CFG.voiceId})});if(vr.ok){var vb=await vr.blob();new Audio(URL.createObjectURL(vb)).play();}}catch(ve){}}loadSystemStatus();}catch(e){hideTyping();addChatMsg('⚠️ Error: '+e.message,'akasha');}finally{if(btn)btn.disabled=false;inp.focus();}}
+function quickAsk(msg){document.getElementById('chat-input').value=msg;sendChat();var p=document.getElementById('agent-panel');if(!p.classList.contains('open'))togglePanel('agent-panel');}
+function addChatMsg(txt,who,ms,model){var a=document.getElementById('chat-msgs');if(!a)return;var w=document.createElement('div');w.style.cssText='display:flex;flex-direction:column;'+(who==='user'?'align-items:flex-end':'');var d=document.createElement('div');d.className=who==='user'?'chat-bbl-u':'chat-bbl-a';d.innerHTML=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/
+/g,'<br/>');w.appendChild(d);if(who==='akasha'&&ms){var m=document.createElement('div');m.className='chat-meta';m.textContent=(model||'akasha')+' · '+ms+'ms';w.appendChild(m);}a.appendChild(w);a.scrollTop=a.scrollHeight;}
+function showTyping(){var a=document.getElementById('chat-msgs');if(!a)return;var d=document.createElement('div');d.id='typing-ind';d.innerHTML='<div style="display:flex;align-items:center;gap:3px;padding:8px 12px;background:#f8fafc;border-radius:12px 12px 12px 4px;border:1px solid var(--border)"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>';a.appendChild(d);a.scrollTop=a.scrollHeight;}
+function hideTyping(){var t=document.getElementById('typing-ind');if(t)t.remove();}
+function toggleVoiceInput(){var btn=document.getElementById('voz-mic'),lbl=document.getElementById('stt-lbl');if(!window.SpeechRecognition&&!window.webkitSpeechRecognition){alert('Requiere Chrome o Edge.');return;}if(btn.classList.contains('active')){if(window._aRec)window._aRec.stop();btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');return;}var SR=window.SpeechRecognition||window.webkitSpeechRecognition;window._aRec=new SR();window._aRec.lang='es-ES';window._aRec.continuous=false;window._aRec.interimResults=false;window._aRec.onresult=function(e){document.getElementById('chat-input').value=e.results[0][0].transcript;btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');sendChat();};window._aRec.onend=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};window._aRec.onerror=function(){btn.classList.remove('active');btn.textContent='🎤';if(lbl)lbl.classList.remove('vis');};window._aRec.start();btn.classList.add('active');btn.textContent='⏹';if(lbl)lbl.classList.add('vis');}
 </script>
 </body>
 </html>
