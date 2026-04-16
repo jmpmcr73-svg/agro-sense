@@ -188,7 +188,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .bxs{padding:4px 10px;font-size:11px}
 .nav-btn{flex-shrink:0;border:none;background:transparent;color:var(--text2);padding:10px 13px;font-size:12px;font-weight:500;white-space:nowrap;border-bottom:2.5px solid transparent;cursor:pointer;transition:all .15s}
 .nav-btn.active{border-bottom-color:var(--green);color:var(--green);background:var(--greenl);font-weight:700}
-.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}#v-db.active{display:flex!important}#v-db{display:none!important}
 .vchip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;white-space:nowrap;font-weight:500}
 .vchip.active{border-color:var(--green2);background:var(--greenl);color:var(--green);font-weight:700}
 .vchip.vwn{border-color:var(--amberb);background:var(--amberl);color:var(--amber)}
@@ -578,8 +578,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
           <img src="data:image/jpeg;base64,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" style="width:100%;height:100%;object-fit:cover"/>
         </div>
         <div style="flex:1">
-          <div class="ak-name">Akasha IA</div>
-          <div class="ak-role">Asistente Agronómico · iAGRI</div>
+          <div class="ak-name">Juan Pablo</div>
+          <div class="ak-role">Agente IA · iAIRobots</div>
         </div>
         <div style="display:flex;align-items:center;gap:7px">
           <span style="font-size:10px;color:rgba(255,255,255,.75)">🔊 Voz</span>
@@ -591,7 +591,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <span id="sem-lbl">Iniciando sistema...</span>
       </div>
       <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;min-height:0">
-        <div style="display:flex"><div class="chat-bbl-a">🌱 ¡Hola! Soy <b>Akasha</b>, tu asistente agronómico de iAGRI.<br/><br/>Puedo analizar correlaciones IoT, alertas, KPIs y darte recomendaciones en tiempo real. ¿En qué te ayudo hoy?</div></div>
+        <div style="display:flex"><div class="chat-bbl-a">🌱 ¡Hola! Soy <b>Juan Pablo</b>, tu asistente agronómico de iAGRI.<br/><br/>Puedo analizar correlaciones IoT, alertas, KPIs y darte recomendaciones en tiempo real. ¿En qué te ayudo hoy?</div></div>
       </div>
       <div id="qpanel" class="ak-prompts">
         <button class="qbtn" onclick="quickAsk('Dame la correlación entre variables del sustrato y ambientales de las últimas 24 horas')">🧪 Correlac. sustrato</button>
@@ -602,7 +602,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       </div>
       <div class="ak-input">
         <div class="ak-input-row">
-          <input id="chat-input" type="text" placeholder="Pregunta a Akasha..." style="flex:1;font-size:13px;padding:9px 11px;border-radius:10px" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()"/>
+          <input id="chat-input" type="text" placeholder="Pregunta a Juan Pablo..." style="flex:1;font-size:13px;padding:9px 11px;border-radius:10px" onkeydown="if(event.key==='Enter'&&!event.shiftKey)sendChat()"/>
           <button class="ak-send" id="chat-send-btn" onclick="sendChat()">➢</button>
           <button class="ak-mic" id="voz-mic" onclick="toggleVoiceInput()" title="Voz">🎤</button>
         </div>
@@ -739,6 +739,7 @@ function navTo(v){
   else if(v==="zn"){shView("v-zn");curView="zn";buildZV();}
   else if(v==="db"){shView("v-db");curView="db";rDB();}
   updBC();
+  ["si","scm","sca"].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display="grid";});
   // Auto-render dashboard
   setTimeout(function(){if(typeof rDB==="function")rDB();},200);
   // Notificar en FAB si hay alertas
@@ -1182,8 +1183,7 @@ window.addEventListener("resize",function(){drawSVC();drawDBCV();buildRobCV();va
 // ── AKASHA v5 LIMPIO ──
 
 // ── AKASHA v5 LIMPIO ──
-async function greetVoice(name){
-  // Auto-saludo: no requiere toggle activado
+async function greetVoice(name){: no requiere toggle activado
   var txt='\u00a1Hola '+name+'! Soy Akasha, tu asistente de iAGRI.';
   try{
     var r=await fetch(CFG.voiceUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,voice_id:CFG.voiceId})});
@@ -1241,7 +1241,7 @@ async function sendChat(){
     addChatMsg(reply,'akasha',elapsed,d.model);
     chatHist.push({role:'user',content:msg});
     chatHist.push({role:'assistant',content:reply});
-    aAudit(curUserName,'chat_akasha','\ud83d\udcac Chat',msg.substring(0,40));
+    aAudit(curUserName,'chat_jp','\ud83d\udcac Chat',msg.substring(0,40));
     var vt=document.getElementById('voz-toggle');
     if(vt&&vt.checked){
       try{
