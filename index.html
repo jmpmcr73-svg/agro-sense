@@ -188,7 +188,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .bxs{padding:4px 10px;font-size:11px}
 .nav-btn{flex-shrink:0;border:none;background:transparent;color:var(--text2);padding:10px 13px;font-size:12px;font-weight:500;white-space:nowrap;border-bottom:2.5px solid transparent;cursor:pointer;transition:all .15s}
 .nav-btn.active{border-bottom-color:var(--green);color:var(--green);background:var(--greenl);font-weight:700}
-.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}#v-db.active{display:flex!important}#v-db{display:none!important}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}#v-db.active{display:flex!important}#v-db{display:none!important}#v-db.active{display:flex!important}#v-db{display:none!important}
 .vchip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;white-space:nowrap;font-weight:500}
 .vchip.active{border-color:var(--green2);background:var(--greenl);color:var(--green);font-weight:700}
 .vchip.vwn{border-color:var(--amberb);background:var(--amberl);color:var(--amber)}
@@ -790,6 +790,8 @@ function initApp(){
   setInterval(function(){var e=document.getElementById("ft");if(e)e.textContent=new Date().toLocaleString("es-CO",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});},30000);
   var e=document.getElementById("ft");if(e)e.textContent=new Date().toLocaleString("es-CO",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"});
   updBC();
+  ["si","scm","sca"].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display="grid";});
+  setTimeout(function(){if(typeof rDB==="function")rDB();},150);
 }
 function buildSG(elId,tipo,cnt,statuses){
   var el=document.getElementById(elId);if(!el)return;el.innerHTML="";
@@ -1324,7 +1326,7 @@ function closeAkashaChat(){
   document.getElementById('akasha-fab').style.display='flex';
 }
 // Cerrar al hacer click fuera
-document.getElementById('akasha-modal').addEventListener('click',function(e){
+var _am=document.getElementById('akasha-modal');if(_am)_am.addEventListener('click',function(e){
   if(e.target===this)closeAkashaChat();
 });
 
