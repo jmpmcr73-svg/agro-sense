@@ -1338,23 +1338,6 @@ var _am=document.getElementById('akasha-modal');if(_am)_am.addEventListener('cli
 
 
 
-// ── TOPBAR KPIs live ──
-function _updateTopKPIs(){
-  try{
-    var ms=gM(curSlot,'1.2');
-    function ga(vk){return avg(ms.map(function(m){return m[vk]||0;}));}
-    var te=document.getElementById('top-temp');
-    var hu=document.getElementById('top-hum');
-    var co=document.getElementById('top-co2');
-    if(te)te.textContent=ga('temp_aire').toFixed(1)+'°C';
-    if(hu)hu.textContent=ga('hum_aire').toFixed(0)+'%';
-    if(co)co.textContent=ga('co2_ppm').toFixed(0)+'ppm';
-  }catch(e){}
-}
-
-// ── Hero image for structures ──
-var _HERO_SRC = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBA...";
-
 </script>
 </body>
 </html>
