@@ -4,13 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>iAGRI · AGROSENSe Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 /* ═══════════════════════════════════════════════════
    AGROSENSe Pro v10 — Industrial Precision Design
    Fonts: DM Sans (UI) + Space Mono (data)
 ═══════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
-
 :root{
   /* Brand */
   --ink:#0a1a0d;
@@ -97,7 +96,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 }
 .lcard{
   position:relative;z-index:1;
-  background:rgba(11,31,14,.95);
+  background:rgba(255,255,255,.97);
   border:1px solid rgba(22,163,74,.25);
   border-radius:var(--r16);
   padding:40px 36px;width:100%;max-width:380px;
@@ -114,27 +113,27 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   width:88px;height:88px;border-radius:18px;
   margin:0 auto 20px;overflow:hidden;display:block;
   border:1px solid rgba(22,163,74,.3);
-  box-shadow:0 0 0 4px rgba(22,163,74,.08),0 8px 24px rgba(0,0,0,.4);
+  box-shadow:0 0 0 3px #fff,0 0 0 5px rgba(22,163,74,.25),0 6px 16px rgba(0,0,0,.12);
 }
 .ltitle{
   font-size:22px;font-weight:700;text-align:center;
-  color:#ffffff;letter-spacing:-.3px;margin-bottom:2px;
+  color:#0a1a0d;letter-spacing:-.3px;margin-bottom:2px;
 }
 .lsub{
   font-size:11px;color:var(--g3);font-weight:400;text-align:center;
   margin-bottom:3px;letter-spacing:.8px;text-transform:uppercase;
   font-family:var(--m);
 }
-.ltag{font-size:11px;color:rgba(255,255,255,.3);text-align:center;margin-bottom:28px;font-family:var(--m)}
+.ltag{font-size:11px;color:#6b7280;text-align:center;margin-bottom:28px;font-family:var(--m)}
 .llbl{
-  font-size:10px;font-weight:600;color:rgba(255,255,255,.4);
+  font-size:10px;font-weight:600;color:#374151;
   margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;display:block;
   font-family:var(--m);
 }
 .lfield{margin-bottom:14px}
 .lfield input{
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
-  color:#fff;border-radius:var(--r8);
+  background:#f8faf8;border:1px solid #d1d5db;
+  color:#0a1a0d;border-radius:var(--r8);
   transition:border-color .15s,background .15s;
 }
 .lfield input:focus{
@@ -142,7 +141,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   border-color:rgba(22,163,74,.4);
   box-shadow:0 0 0 3px rgba(22,163,74,.08);
 }
-.lfield input::placeholder{color:rgba(255,255,255,.2)}
+.lfield input::placeholder{color:#9ca3af}
 .lbtn{
   width:100%;padding:13px;margin-top:6px;
   background:var(--g2);color:#fff;
@@ -159,7 +158,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   border-radius:var(--r8);border:1px solid rgba(185,28,28,.3);
   font-family:var(--m);
 }
-.lhint{text-align:center;margin-top:14px;font-size:10px;color:rgba(255,255,255,.18);font-family:var(--m)}
+.lhint{text-align:center;margin-top:14px;font-size:10px;color:#9ca3af;font-family:var(--m)}
 
 /* ════════════════════════════════
    TOPBAR
