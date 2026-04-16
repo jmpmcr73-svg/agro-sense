@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>iAGRI · AGROSENSe Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f8faf8;--bg2:#ffffff;--bg3:#f0f7f0;--bg4:#e8f5e8;
+  --green:#16a34a;--green2:#22c55e;--green3:#4ade80;--green-dark:#14532d;
+  --amber:#d97706;--red:#dc2626;--blue:#2563eb;--purple:#7c3aed;
+  --text:#111827;--text2:#4b5563;--text3:#9ca3af;--text4:#d1d5db;
+  --border:#e5e7eb;--border2:#d1fae5;--border3:#bbf7d0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --font:'Outfit',sans-serif; --mono:'JetBrains Mono',monospace;
+  --radius:10px;--radius-lg:14px;--radius-xl:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;font-size:14px}
+button{font-family:var(--font);cursor:pointer}
+input,select,textarea{font-family:var(--font);outline:none;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-size:13px;width:100%;transition:border-color .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--green2)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2316a34a' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border3);border-radius:4px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.fade{animation:fadeIn .25s ease both}
+.pulse{animation:pulse 2s infinite}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow)}
+.card-green{background:#f0fdf4;border-color:var(--border3)}
+.label{font-size:10px;color:var(--text2);letter-spacing:1.2px;text-transform:uppercase;font-weight:600}
+.mono{font-family:var(--mono)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-ok{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+.b-warn{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.b-crit{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.b-info{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}
+.b-gray{background:#f3f4f6;color:#4b5563;border:1px solid #e5e7eb}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}
+.btn-outline{background:#fff;color:var(--green);border:1.5px solid var(--green2)}.btn-outline:hover{background:#f0fdf4}
+.btn-red{background:#fff;color:var(--red);border:1.5px solid #fecaca}
+.btn-sm{padding:5px 12px;font-size:12px}
+.nav-btn{flex-shrink:0;border:none;background:transparent;color:var(--text2);padding:9px 12px;font-size:12px;font-weight:500;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s}
+.nav-btn.active{border-bottom-color:var(--green);color:var(--green);background:#f0fdf4}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeIn .25s ease}
+.vchip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;white-space:nowrap;font-weight:500}
+.vchip.active{border-color:var(--green2);background:#f0fdf4;color:var(--green)}
+.vchip.alert{border-color:#fde68a;background:#fffbeb;color:var(--amber)}
+.vchip.crit{border-color:#fecaca;background:#fff5f5;color:var(--red)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 10px;text-align:left;background:#f9fafb;color:var(--text2);font-weight:600;border-bottom:1.5px solid var(--border);font-size:11px;letter-spacing:.5px}
+.tbl td{padding:8px 10px;border-bottom:1px solid #f3f4f6;color:var(--text)}
+.tbl tr:hover td{background:#f9fafb}
+.topbar{background:#fff;border-bottom:1.5px solid var(--border);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.avatar{border-radius:50%;object-fit:cover;border:2px solid var(--border3)}
+.rob-zone-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:10px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.rob-zone-card.active{border-color:var(--green2);background:#f0fdf4}
+.rob-zone-card.done{border-color:var(--border3);background:#f8fffe;opacity:.7}
+.iot-node{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius);border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s}
+.iot-node.selected{border-color:var(--blue);background:#eff6ff}
+.iot-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.iot-dot.ok{background:#22c55e}.iot-dot.warn{background:#f59e0b}.iot-dot.off{background:#d1d5db}
+.cuaderno-item{border-left:3px solid var(--green2);padding:10px 12px;background:#fff;border-radius:0 var(--radius) var(--radius) 0;margin-bottom:8px;box-shadow:var(--shadow)}
+.audit-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f3f4f6}
+
+/* ESTILOS DEL CHAT IA JUAN PABLO */
+.chat-bbl-u{background:#e8f5e8;border-radius:12px 12px 3px 12px;padding:9px 12px;font-size:12px;max-width:88%;color:#14532d;border:1px solid #bbf7d0;line-height:1.5;}
+.chat-bbl-a{background:#fff;border-radius:12px 12px 12px 3px;padding:9px 12px;font-size:12px;max-width:92%;border:1px solid var(--border);color:var(--text);box-shadow:var(--shadow);line-height:1.5;}
+.typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite;margin:0 2px}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+</style>
+</head>
+<body>
+<div id="s-login" class="screen active">
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#f0fdf4 0%,#fff 50%,#eff6ff 100%);position:relative;overflow:hidden;">
+  <img src="assets/stella-maris.png" style="position:absolute;bottom:-20px;right:-20px;width:250px;opacity:0.05;pointer-events:none;" alt="Stella Maris Group"/>
+  <div style="width:100%;max-width:360px;position:relative;z-index:1;">
+    <div style="text-align:center;margin-bottom:32px">
+      <img src="assets/ia-irobots.png" style="width:88px;height:88px;border-radius:18px;margin:0 auto 14px;display:block;box-shadow:0 8px 24px rgba(22,163,74,.2);border:2px solid #fff;object-fit:cover;" alt="iAIRobots"/>
+      <div style="font-size:24px;font-weight:700;color:#111827">iAIRobots</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:3px">AGROSENSe Pro · Stella Maris</div>
+    </div>
+    <div class="card">
+      <div class="label" style="margin-bottom:14px;text-align:center">INICIAR SESIÓN</div>
+      <div style="margin-bottom:10px"><div class="label" style="margin-bottom:4px">Usuario</div><input id="l-u" type="text" value="admin@agrosense.co" placeholder="email"/></div>
+      <div style="margin-bottom:18px"><div class="label" style="margin-bottom:4px">Contraseña</div><input id="l-p" type="password" value="agro2026" placeholder="••••••"/></div>
+      <button onclick="doLogin()" class="btn btn-primary lbtn" style="width:100%;justify-content:center;padding:11px">INGRESAR →</button>
+      <div id="l-err" style="display:none;font-size:11px;color:var(--red);text-align:center;margin-top:8px">Credenciales incorrectas</div>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:var(--text3)" class="mono">admin@agrosense.co · agro2026</div>
+  </div>
+</div>
+</div>
+
+<div id="s-app" class="screen">
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <img src="assets/iagritrasp.png" style="height:34px;object-fit:contain;" alt="iAGRI"/>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--text)">iAIRobots</div>
+      <div id="top-sub" style="font-size:10px;color:var(--text3)" class="mono">AGROSENSe Pro v11.5</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div id="alert-badge" style="display:none" class="badge b-crit" onclick="showTab('t-alert',document.querySelector('.nav-btn:nth-child(7)'))">⚠ 4</div>
+    <div class="pulse" style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+    <div style="position:relative;cursor:pointer" onclick="toggleAgentPanel()">
+      <img src="assets/jp%20oa%20i-robots.png" class="avatar" style="width:34px;height:34px"/>
+      <div style="position:absolute;bottom:-1px;right:-1px;width:12px;height:12px;background:#16a34a;border-radius:50%;border:2px solid #fff;font-size:7px;display:flex;align-items:center;justify-content:center">🤖</div>
+    </div>
+    <button onclick="doLogout()" class="btn btn-sm" style="background:#f9fafb;border:1px solid var(--border);color:var(--text2)">🚪</button>
+  </div>
+</div>
+
+<div style="background:#fff;border-bottom:1.5px solid var(--border);padding:8px 14px">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:110px">
+      <span class="label" style="white-space:nowrap">TIPO</span>
+      <select id="sel-tipo" onchange="onTipoChange()" style="font-size:11px;padding:5px 24px 5px 8px">
+        <option value="invernadero">🏗 Invernaderos (35)</option>
+        <option value="casa_malla">🕸 Casas Malla (8)</option>
+        <option value="campo_abierto">🌾 Campo Abierto (35 ha)</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:110px">
+      <span class="label" style="white-space:nowrap">STRUCT</span>
+      <select id="sel-estructura" onchange="onEstructuraChange()" style="font-size:11px;padding:5px 24px 5px 8px"></select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;min-width:90px">
+      <span class="label" style="white-space:nowrap">SLOT</span>
+      <select id="sel-slot" onchange="onSlotChange()" style="font-size:11px;padding:5px 24px 5px 8px">
+        <option value="1">06 AM</option><option value="2">09 AM</option>
+        <option value="3" selected>12 PM</option><option value="4">03 PM</option><option value="5">06 PM</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;gap:6px;padding:8px 14px;overflow-x:auto;background:#fafbfa;border-bottom:1px solid var(--border)" id="var-row"></div>
+<div style="background:#fff;border-bottom:1.5px solid var(--border);display:flex;overflow-x:auto;padding:0 8px">
+  <button class="nav-btn active" onclick="showTab('t-dash',this)">🏠 Dashboard</button>
+  <button class="nav-btn" onclick="showTab('t-mapa',this)">🗺 Mapa</button>
+  <button class="nav-btn" onclick="showTab('t-graf',this)">📊 Gráficas</button>
+  <button class="nav-btn" onclick="showTab('t-robot',this)">🤖 Robot</button>
+  <button class="nav-btn" onclick="showTab('t-cuaderno',this)">📋 Cuaderno</button>
+  <button class="nav-btn" onclick="showTab('t-prod',this)">👥 Productores</button>
+  <button class="nav-btn" onclick="showTab('t-alert',this)">🚨 Alertas</button>
+  <button class="nav-btn" onclick="showTab('t-iot',this)">📡 IoT</button>
+  <button class="nav-btn" onclick="showTab('t-audit',this)">📝 Auditoría</button>
+</div>
+
+<div style="padding:12px;max-width:800px;margin:0 auto;padding-bottom:60px;">
+
+<div id="t-dash" class="tab-pane active fade">
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px" id="dash-title">🏗 Invernadero 01 — Tomate Cherry · Sem. 2</div>
+    <canvas id="inv-canvas" style="width:100%;border-radius:8px;display:block;cursor:pointer" height="185"></canvas>
+    <div style="display:flex;justify-content:space-between;margin-top:5px">
+      <span style="font-size:10px;color:var(--text3)">Toca zona · verde=ok · amarillo=alerta · rojo=crítico</span>
+      <span id="sel-zone" style="font-size:10px;color:var(--green)"></span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px" id="kpi-row"></div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">📍 30 PUNTOS/PASILLO — 3 ALTURAS</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+      <div style="background:#f0fdf4;border-radius:8px;padding:8px;border-left:3px solid #22c55e">
+        <div class="label">Sustrato</div><div style="font-size:20px;font-weight:700;color:#16a34a">10</div>
+        <div style="font-size:9px;color:var(--text3)">z=0 cm · T·H·CE</div>
+      </div>
+      <div style="background:#fffbeb;border-radius:8px;padding:8px;border-left:3px solid #f59e0b">
+        <div class="label">Medio</div><div style="font-size:20px;font-weight:700;color:#d97706">10</div>
+        <div style="font-size:9px;color:var(--text3)">z=1.2m · T·H·CO₂</div>
+      </div>
+      <div style="background:#eff6ff;border-radius:8px;padding:8px;border-left:3px solid #3b82f6">
+        <div class="label">Alto</div><div style="font-size:20px;font-weight:700;color:#2563eb">10</div>
+        <div style="font-size:9px;color:var(--text3)">z=2.0m · PAR·Solar</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;background:#f9fafb;border-radius:8px;padding:8px;font-size:11px;color:var(--text2)">
+      📐 <b style="color:var(--text)">30 pts × <span id="n-zonas">14</span> zonas × 5 slots = <span id="n-meds">2,100</span> mediciones/día</b>
+    </div>
+  </div>
+  <div class="card">
+    <div class="label" style="margin-bottom:8px">🕐 ÚLTIMAS MEDICIONES IoT FIJO</div>
+    <div id="last-meds"></div>
+  </div>
+</div>
+
+<div id="t-mapa" class="tab-pane">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+    <select id="map-z" onchange="redrawMap()" style="flex:1;min-width:90px;font-size:11px">
+      <option value="0">z=0 Sustrato</option><option value="1.2" selected>z=1.2m Medio</option><option value="2.0">z=2.0m Alto</option>
+    </select>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div id="map-title" class="label" style="margin-bottom:8px"></div>
+    <canvas id="hmap" style="width:100%;border-radius:8px;display:block"></canvas>
+    <div style="display:flex;align-items:center;gap:5px;margin-top:6px">
+      <span id="leg-min" style="font-size:9px;color:var(--text3)"></span>
+      <canvas id="leg-c" style="flex:1;height:8px;border-radius:4px"></canvas>
+      <span id="leg-max" style="font-size:9px;color:var(--text3)"></span>
+    </div>
+    <div style="font-size:9px;color:var(--text3);margin-top:3px">● puntos reales · gradiente IDW · | zona óptima</div>
+  </div>
+  <div class="card"><div class="label" style="margin-bottom:6px">PROMEDIO POR ZONA <span style="font-size:9px;color:var(--text3)">(máx · prom · mín)</span></div><div id="zone-bars"></div></div>
+</div>
+
+<div id="t-graf" class="tab-pane">
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><select id="gr-zona" onchange="drawCharts()" style="flex:1;font-size:11px"><option value="all">Todas las zonas</option></select></div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:4px">
+      <div class="label">EVOLUCIÓN DIARIA</div>
+      <div id="gr-stats" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <canvas id="chart-day" height="175" style="width:100%;display:block"></canvas>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PERFIL VERTICAL Z</div>
+    <canvas id="chart-z" height="145" style="width:100%;display:block"></canvas>
+  </div>
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">MÁX · MÍN · PROM POR ZONA</div>
+    <canvas id="chart-mmm" height="155" style="width:100%;display:block"></canvas>
+  </div>
+  <div class="card"><div class="label" style="margin-bottom:8px">TABLA ESTADÍSTICA CON UMBRALES</div><div id="stats-table" style="overflow-x:auto"></div></div>
+</div>
+<div id="t-robot" class="tab-pane">
+  <div class="label" style="margin-bottom:10px">🤖 OPERACIÓN ROBOT CAR</div>
+  
+  <div class="card" style="margin-bottom:10px;text-align:center;background:#f0fdf4;">
+    <img src="assets/iamando.png" style="max-height:100px;object-fit:contain;margin-bottom:10px;" alt="Control Robot"/>
+    <div style="font-size:11px;font-weight:700;color:var(--green-dark);font-family:var(--mono);">ENLACE TELEMETRÍA OK</div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PASO 1 — MODO DE OPERACIÓN</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="setRobMode('auto')" id="mode-auto" class="btn btn-primary btn-sm">🔄 Automático</button>
+      <button onclick="setRobMode('manual')" id="mode-manual" class="btn btn-outline btn-sm">👋 Manual</button>
+      <button onclick="setRobMode('calibracion')" id="mode-cal" class="btn btn-outline btn-sm">🎯 Calibración IoT</button>
+    </div>
+    <div id="mode-desc" style="margin-top:8px;font-size:11px;color:var(--text2);background:#f9fafb;border-radius:6px;padding:8px">
+      Modo automático: el robot recorre todas las zonas secuencialmente.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PASO 2 — CONFIGURACIÓN</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div class="label" style="margin-bottom:4px">Slot Horario</div>
+        <select id="rob-slot" style="font-size:11px"><option value="1">06 AM</option><option value="3" selected>12 PM</option><option value="5">06 PM</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">Altura Z</div>
+        <select id="rob-z" style="font-size:11px"><option value="1.2" selected>z=1.2m</option><option value="all">Todos (3 pasadas)</option></select></div>
+    </div>
+    <div id="cal-panel" style="display:none">
+      <div class="label" style="margin-bottom:6px">NODOS IOT PARA CALIBRACIÓN</div>
+      <div id="iot-nodes-list" style="display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:6px">PASO 3 — ZONAS A RECORRER</div>
+    <canvas id="rob-canvas" height="125" style="width:100%;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;display:block"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="label" style="margin-bottom:10px">PASO 4 — INICIAR RECORRIDO</div>
+    <div id="rob-summary" style="background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;color:var(--text2)"></div>
+    <button onclick="startRobot()" id="rob-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:13px">
+      🤖 INICIAR RECORRIDO
+    </button>
+    <div id="rob-prog" style="display:none;margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:5px">
+        <span id="rob-lbl">Iniciando...</span><span id="rob-pct" class="mono">0%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;margin-bottom:10px">
+        <div id="rob-bar" style="background:linear-gradient(90deg,#16a34a,#22c55e);height:100%;width:0%;transition:width .4s;border-radius:4px"></div>
+      </div>
+      <div id="rob-zones-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="t-cuaderno" class="tab-pane">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <div class="label">📋 CUADERNO DE CAMPO</div>
+    <button onclick="showCuadernoForm()" class="btn btn-primary btn-sm">+ Registrar</button>
+  </div>
+  <div id="cuaderno-form" class="card" style="display:none;margin-bottom:10px;border-color:var(--border3)">
+    <div style="font-weight:600;color:var(--green);margin-bottom:12px;font-size:13px">📝 Nuevo Registro de Campo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div class="label" style="margin-bottom:4px">ZONA</div><select id="cf-zona" style="font-size:11px"><option>1I</option><option>1D</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">TIPO REGISTRO</div><select id="cf-tipo" style="font-size:11px"><option value="siembra">🌱 Siembra</option><option value="observacion">👁 Observación</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">FECHA</div><input id="cf-fecha" type="date"/></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="label" style="margin-bottom:4px">NOTAS</div>
+      <textarea id="cf-notas" rows="2" placeholder="Observaciones..." style="height:56px;resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="hideCuadernoForm()" class="btn btn-sm" style="background:#f9fafb;border:1px solid var(--border);color:var(--text2)">Cancelar</button>
+      <button onclick="saveCuaderno()" class="btn btn-primary btn-sm">Guardar ✓</button>
+    </div>
+  </div>
+  <div id="cuaderno-list"></div>
+</div>
+
+<div id="t-prod" class="tab-pane"><div class="label" style="margin-bottom:10px">👥 PRODUCTORES</div><div id="prod-list"></div></div>
+<div id="t-alert" class="tab-pane"><div class="label" style="margin-bottom:10px">🚨 ALERTAS DEL AGENTE MATEMÁTICO</div><div id="alert-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+<div id="t-iot" class="tab-pane"><div class="label" style="margin-bottom:10px">📡 MÓDULO IOT FIJO</div><div id="iot-sensors-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
+<div id="t-audit" class="tab-pane"><div class="label" style="margin-bottom:10px">📝 AUDITORÍA DE ACCIONES</div><div class="card" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Hora</th><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Objeto</th></tr></thead><tbody id="audit-body"></tbody></table></div></div>
+
+</div></div>```
+
+### PARTE 5: Panel de IA Juan Pablo (Chat UI)
+```html
+<div id="agent-panel" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.3)" onclick="hideAgentPanel()">
+  <div onclick="event.stopPropagation()" style="position:absolute;right:0;top:0;bottom:0;width:min(340px,92vw);background:var(--bg);box-shadow:-4px 0 24px rgba(0,0,0,.12);animation:slideIn .25s ease;display:flex;flex-direction:column;">
+    
+    <div style="padding:16px;background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <div style="position:relative">
+        <img src="assets/jp%20oa%20i-robots.png" class="avatar" style="width:42px;height:42px"/>
+        <div style="position:absolute;bottom:0;right:0;width:14px;height:14px;background:#16a34a;border-radius:50%;border:2px solid #fff;font-size:8px;display:flex;align-items:center;justify-content:center">🤖</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">Juan Pablo</div>
+        <div style="font-size:11px;color:var(--text2)">Agente IA · Akasha Brain</div>
+      </div>
+      <button onclick="hideAgentPanel()" class="btn btn-sm" style="background:#f9fafb;border:1px solid var(--border);color:var(--text2)">✕</button>
+    </div>
+
+    <div style="background:#f0fdf4;border-bottom:1px solid #bbf7d0;padding:6px 16px;display:flex;align-items:center;gap:6px;font-size:11px;color:#16a34a;flex-shrink:0" class="mono">
+      <span id="sem-dot" class="pulse" style="width:8px;height:8px;border-radius:50%;background:#22c55e"></span>
+      <span id="sem-lbl">ENLACE TELEMETRÍA OK</span>
+    </div>
+
+    <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background-image:url('assets/stella-maris.png');background-size:70%;background-position:center;background-repeat:no-repeat;background-blend-mode:luminosity;">
+      <div style="display:flex">
+        <div class="chat-bbl-a">🌿 <b>Juan Pablo</b><br/><br/>Conectado a la telemetría de Stella Maris. Reviso correlaciones y KPIs. ¿En qué te ayudo hoy?</div>
+      </div>
+    </div>
+
+    <div style="padding:8px 12px;background:#fff;border-top:1px solid var(--border);display:flex;gap:5px;overflow-x:auto;flex-shrink:0;">
+      <button class="vchip" onclick="quickAsk('Dime las métricas del pasillo 1I')">Métricas</button>
+      <button class="vchip" onclick="quickAsk('¿Hay riesgo de hongos hoy?')">Riesgos</button>
+      <button class="vchip" onclick="quickAsk('Resumen de alertas activas')">Alertas</button>
+    </div>
+
+    <div style="padding:12px;background:#fff;border-top:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-shrink:0;">
+      <input id="chat-input" type="text" placeholder="Pregunta a Juan Pablo..." style="flex:1;font-size:13px;border-radius:20px;padding:10px 14px;" onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="btn btn-primary" id="chat-send-btn" onclick="sendChat()" style="border-radius:50%;width:38px;height:38px;padding:0;justify-content:center;flex-shrink:0;">➤</button>
+    </div>
+
+  </div>
+</div>
+
+<div style="background:#fff;border-top:1px solid var(--border);padding:6px 14px;display:flex;justify-content:space-between;font-size:10px;color:var(--text3);position:fixed;bottom:0;width:100%;z-index:90" class="mono">
+  <span>iAIRobots · AGROSENSe Pro v11.5 · Stella Maris</span>
+  <span id="ft-time"></span>
+</div>
+<div id="t-robot" class="tab-pane">
+  <div class="label" style="margin-bottom:10px">🤖 OPERACIÓN ROBOT CAR</div>
+  
+  <div class="card" style="margin-bottom:10px;text-align:center;background:#f0fdf4;">
+    <img src="assets/iamando.png" style="max-height:100px;object-fit:contain;margin-bottom:10px;" alt="Control Robot"/>
+    <div style="font-size:11px;font-weight:700;color:var(--green-dark);font-family:var(--mono);">ENLACE TELEMETRÍA OK</div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PASO 1 — MODO DE OPERACIÓN</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="setRobMode('auto')" id="mode-auto" class="btn btn-primary btn-sm">🔄 Automático</button>
+      <button onclick="setRobMode('manual')" id="mode-manual" class="btn btn-outline btn-sm">👋 Manual</button>
+      <button onclick="setRobMode('calibracion')" id="mode-cal" class="btn btn-outline btn-sm">🎯 Calibración IoT</button>
+    </div>
+    <div id="mode-desc" style="margin-top:8px;font-size:11px;color:var(--text2);background:#f9fafb;border-radius:6px;padding:8px">
+      Modo automático: el robot recorre todas las zonas secuencialmente.
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:8px">PASO 2 — CONFIGURACIÓN</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div class="label" style="margin-bottom:4px">Slot Horario</div>
+        <select id="rob-slot" style="font-size:11px"><option value="1">06 AM</option><option value="3" selected>12 PM</option><option value="5">06 PM</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">Altura Z</div>
+        <select id="rob-z" style="font-size:11px"><option value="1.2" selected>z=1.2m</option><option value="all">Todos (3 pasadas)</option></select></div>
+    </div>
+    <div id="cal-panel" style="display:none">
+      <div class="label" style="margin-bottom:6px">NODOS IOT PARA CALIBRACIÓN</div>
+      <div id="iot-nodes-list" style="display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <div class="label" style="margin-bottom:6px">PASO 3 — ZONAS A RECORRER</div>
+    <canvas id="rob-canvas" height="125" style="width:100%;border-radius:8px;border:1.5px solid var(--border);cursor:pointer;display:block"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="label" style="margin-bottom:10px">PASO 4 — INICIAR RECORRIDO</div>
+    <div id="rob-summary" style="background:#f9fafb;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;color:var(--text2)"></div>
+    <button onclick="startRobot()" id="rob-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:13px">
+      🤖 INICIAR RECORRIDO
+    </button>
+    <div id="rob-prog" style="display:none;margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:5px">
+        <span id="rob-lbl">Iniciando...</span><span id="rob-pct" class="mono">0%</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:7px;overflow:hidden;margin-bottom:10px">
+        <div id="rob-bar" style="background:linear-gradient(90deg,#16a34a,#22c55e);height:100%;width:0%;transition:width .4s;border-radius:4px"></div>
+      </div>
+      <div id="rob-zones-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="t-cuaderno" class="tab-pane">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+    <div class="label">📋 CUADERNO DE CAMPO</div>
+    <button onclick="showCuadernoForm()" class="btn btn-primary btn-sm">+ Registrar</button>
+  </div>
+  <div id="cuaderno-form" class="card" style="display:none;margin-bottom:10px;border-color:var(--border3)">
+    <div style="font-weight:600;color:var(--green);margin-bottom:12px;font-size:13px">📝 Nuevo Registro de Campo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div><div class="label" style="margin-bottom:4px">ZONA</div><select id="cf-zona" style="font-size:11px"><option>1I</option><option>1D</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">TIPO REGISTRO</div><select id="cf-tipo" style="font-size:11px"><option value="siembra">🌱 Siembra</option><option value="observacion">👁 Observación</option></select></div>
+      <div><div class="label" style="margin-bottom:4px">FECHA</div><input id="cf-fecha" type="date"/></div>
+    </div>
+    <div style="margin-bottom:8px">
+      <div class="label" style="margin-bottom:4px">NOTAS</div>
+      <textarea id="cf-notas" rows="2" placeholder="Observaciones..." style="height:56px;resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="hideCuadernoForm()" class="btn btn-sm" style="background:#f9fafb;border:1px solid var(--border);color:var(--text2)">Cancelar</button>
+      <button onclick="saveCuaderno()" class="btn btn-primary btn-sm">Guardar ✓</button>
+    </div>
+  </div>
+  <div id="cuaderno-list"></div>
+</div>
+
+<div id="t-prod" class="tab-pane"><div class="label" style="margin-bottom:10px">👥 PRODUCTORES</div><div id="prod-list"></div></div>
+<div id="t-alert" class="tab-pane"><div class="label" style="margin-bottom:10px">🚨 ALERTAS DEL AGENTE MATEMÁTICO</div><div id="alert-list" style="display:flex;flex-direction:column;gap:8px"></div></div>
+<div id="t-iot" class="tab-pane"><div class="label" style="margin-bottom:10px">📡 MÓDULO IOT FIJO</div><div id="iot-sensors-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div></div>
+<div id="t-audit" class="tab-pane"><div class="label" style="margin-bottom:10px">📝 AUDITORÍA DE ACCIONES</div><div class="card" style="overflow-x:auto"><table class="tbl"><thead><tr><th>Hora</th><th>Usuario</th><th>Acción</th><th>Módulo</th><th>Objeto</th></tr></thead><tbody id="audit-body"></tbody></table></div></div>
+
+</div></div>```
+
+### PARTE 5: Panel de IA Juan Pablo (Chat UI)
+```html
+<div id="agent-panel" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.3)" onclick="hideAgentPanel()">
+  <div onclick="event.stopPropagation()" style="position:absolute;right:0;top:0;bottom:0;width:min(340px,92vw);background:var(--bg);box-shadow:-4px 0 24px rgba(0,0,0,.12);animation:slideIn .25s ease;display:flex;flex-direction:column;">
+    
+    <div style="padding:16px;background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <div style="position:relative">
+        <img src="assets/jp%20oa%20i-robots.png" class="avatar" style="width:42px;height:42px"/>
+        <div style="position:absolute;bottom:0;right:0;width:14px;height:14px;background:#16a34a;border-radius:50%;border:2px solid #fff;font-size:8px;display:flex;align-items:center;justify-content:center">🤖</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;color:var(--text)">Juan Pablo</div>
+        <div style="font-size:11px;color:var(--text2)">Agente IA · Akasha Brain</div>
+      </div>
+      <button onclick="hideAgentPanel()" class="btn btn-sm" style="background:#f9fafb;border:1px solid var(--border);color:var(--text2)">✕</button>
+    </div>
+
+    <div style="background:#f0fdf4;border-bottom:1px solid #bbf7d0;padding:6px 16px;display:flex;align-items:center;gap:6px;font-size:11px;color:#16a34a;flex-shrink:0" class="mono">
+      <span id="sem-dot" class="pulse" style="width:8px;height:8px;border-radius:50%;background:#22c55e"></span>
+      <span id="sem-lbl">ENLACE TELEMETRÍA OK</span>
+    </div>
+
+    <div id="chat-msgs" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background-image:url('assets/stella-maris.png');background-size:70%;background-position:center;background-repeat:no-repeat;background-blend-mode:luminosity;">
+      <div style="display:flex">
+        <div class="chat-bbl-a">🌿 <b>Juan Pablo</b><br/><br/>Conectado a la telemetría de Stella Maris. Reviso correlaciones y KPIs. ¿En qué te ayudo hoy?</div>
+      </div>
+    </div>
+
+    <div style="padding:8px 12px;background:#fff;border-top:1px solid var(--border);display:flex;gap:5px;overflow-x:auto;flex-shrink:0;">
+      <button class="vchip" onclick="quickAsk('Dime las métricas del pasillo 1I')">Métricas</button>
+      <button class="vchip" onclick="quickAsk('¿Hay riesgo de hongos hoy?')">Riesgos</button>
+      <button class="vchip" onclick="quickAsk('Resumen de alertas activas')">Alertas</button>
+    </div>
+
+    <div style="padding:12px;background:#fff;border-top:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-shrink:0;">
+      <input id="chat-input" type="text" placeholder="Pregunta a Juan Pablo..." style="flex:1;font-size:13px;border-radius:20px;padding:10px 14px;" onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="btn btn-primary" id="chat-send-btn" onclick="sendChat()" style="border-radius:50%;width:38px;height:38px;padding:0;justify-content:center;flex-shrink:0;">➤</button>
+    </div>
+
+  </div>
+</div>
+
+<div style="background:#fff;border-top:1px solid var(--border);padding:6px 14px;display:flex;justify-content:space-between;font-size:10px;color:var(--text3);position:fixed;bottom:0;width:100%;z-index:90" class="mono">
+  <span>iAIRobots · AGROSENSe Pro v11.5 · Stella Maris</span>
+  <span id="ft-time"></span>
+</div>
+<script>
+// ═══════════════════════════════════════════════════
+// CONFIG & SUPABASE BACKEND
+// ═══════════════════════════════════════════════════
+var uRole='admin', curUserName='Juan Pablo Moreno', curClienteId='f0001';
+var CFG={
+  supa:'https://crfghwtfqaplzsmwylxe.supabase.co',
+  anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZmdod3RmcWFwbHpzbXd5bHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjc1MjksImV4cCI6MjA5MDkwMzUyOX0.WUNkTqU93H92nohb_Idqhu8nV1JblFvVRk6Lf_PJw64',
+  chatUrl:'https://crfghwtfqaplzsmwylxe.supabase.co/functions/v1/akasha-chat'
+};
+var SUPA_HEADERS={'apikey':CFG.anonKey,'Authorization':'Bearer '+CFG.anonKey,'Content-Type':'application/json'};
+var chatHist=[], _sid='s_'+Math.random().toString(36).substr(2,9);
+
+var VARS = {
+  temp_aire:    {l:"Temp Aire",     u:"°C",      ic:"🌡",mn:16,mx:38,omn:20,omx:30,c:["#0ea5e9","#22c55e","#fbbf24","#f97316","#ef4444"],tipos:["invernadero","casa_malla","campo_abierto"]},
+  hum_aire:     {l:"Hum Aire",      u:"%RH",     ic:"💧",mn:40,mx:95,omn:60,omx:82,c:["#3b82f6","#06b6d4","#22c55e","#fbbf24","#ef4444"],tipos:["invernadero","casa_malla","campo_abierto"]},
+  co2_ppm:      {l:"CO₂",           u:"ppm",     ic:"🌬",mn:380,mx:900,omn:420,omx:750,c:["#22c55e","#84cc16","#fbbf24","#f97316","#ef4444"],tipos:["invernadero","casa_malla"]},
+  hum_sustrato: {l:"Hum Sust.",     u:"%VWC",    ic:"🌱",mn:40,mx:85,omn:62,omx:78,c:["#ef4444","#f97316","#22c55e","#0ea5e9","#3b82f6"],tipos:["invernadero","casa_malla"]},
+  ce_sustrato:  {l:"CE Sust.",      u:"mS/cm",   ic:"⚡",mn:1.2,mx:3.8,omn:2.0,omx:2.6,c:["#22c55e","#84cc16","#fbbf24","#f97316","#ef4444"],tipos:["invernadero","casa_malla"]},
+  radiacion_par:{l:"Rad PAR",       u:"μmol",    ic:"☀️",mn:0,mx:2200,omn:50,omx:1800,c:["#1e3a8a","#2563eb","#d97706","#f97316","#fef9c3"],tipos:["invernadero","casa_malla"]},
+  ch4_ppm:      {l:"Metano CH₄",    u:"ppm",     ic:"🔥",mn:0,mx:50,omn:0,omx:5,c:["#22c55e","#84cc16","#fbbf24","#f97316","#ef4444"],tipos:["invernadero","casa_malla","campo_abierto"]}
+};
+var SLOT_BASE={
+  1:{temp_aire:21,hum_aire:79,co2_ppm:472,hum_sustrato:71,ce_sustrato:2.1,radiacion_par:60,ch4_ppm:1.2},
+  3:{temp_aire:30,hum_aire:64,co2_ppm:610,hum_sustrato:65,ce_sustrato:2.4,radiacion_par:1820,ch4_ppm:2.5},
+  5:{temp_aire:23,hum_aire:76,co2_ppm:495,hum_sustrato:70,ce_sustrato:2.2,radiacion_par:290,ch4_ppm:1.5}
+};
+var Z_FACTOR={"0":0.88,"1.2":1.0,"2.0":1.06};
+var ALERTS_DATA=[
+  {v:"temp_aire",lv:"critico",pasillo:"6I",z:"1.2m",val:34.8,thr:30,msg:"Temperatura crítica pasillo 6 izquierda",ac:"Activar ventilación forzada norte",ok:false},
+  {v:"hum_sustrato",lv:"advertencia",pasillo:"11D",z:"0cm",val:58.2,thr:62,msg:"Déficit hídrico proyectado P11 derecha",ac:"Revisar goteo D-11",ok:false}
+];
+var cuadernoData=[]; var auditLog=[]; var productores=[{id:"p1",nombre:"Juan Pablo",apellido:"Moreno",email:"jp@hidroexpo.co",tel:"3101234567",doc:"CC 109",rol:"admin",estructuras:["Todo el complejo"],activo:true}];
+var iOTNodes=[{id:"IOT-001",zona:"1I",tipo:"temperatura",valor:29.8,estado:"ok",altura:"0cm"}];
+
+var robMode="auto",robActive=false;
+var selectedZones={},selectedIoTNodes=[];
+var curVk="temp_aire",curSlot=3,curTipo="invernadero";
+var curEstructura={nombre:"Invernadero 01",filas:7,cols:2,zonas:14,cultivo:"Tomate Cherry",semana:2};
+var medsCache={};
+for(var i=1;i<=7;i++){selectedZones[i+"I"]=true;selectedZones[i+"D"]=true;}
+
+// HELPERS
+function rnd(n){return(Math.random()-.5)*2*n;}
+function hexRgb(h){var m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return m?[parseInt(m[1],16),parseInt(m[2],16),parseInt(m[3],16)]:null;}
+function getColor(val,vk,a){a=a||.88;var cfg=VARS[vk];if(!cfg)return"#888";var t=Math.max(0,Math.min(1,(val-cfg.mn)/(cfg.mx-cfg.mn)));var cols=cfg.c,n=cols.length,seg=(n-1)*t,i=Math.min(Math.floor(seg),n-2),f=seg-i;var c1=hexRgb(cols[i]),c2=hexRgb(cols[i+1]);if(!c1||!c2)return"#888";return"rgba("+Math.round(c1[0]+f*(c2[0]-c1[0]))+","+Math.round(c1[1]+f*(c2[1]-c1[1]))+","+Math.round(c1[2]+f*(c2[2]-c1[2]))+","+a+")";}
+function idw(pts,gx,gy){var n=0,d=0;for(var i=0;i<pts.length;i++){var dx=gx-pts[i].x,dy=gy-pts[i].y,d2=dx*dx+dy*dy;if(d2<.01)return pts[i].v;var w=1/d2;n+=w*pts[i].v;d+=w;}return d===0?null:n/d;}
+function avg(arr){if(!arr||!arr.length)return 0;return arr.reduce((a,b)=>a+b,0)/arr.length;}
+function getStatus(val,vk){var c=VARS[vk];if(!c)return"ok";if(val>c.mx||val<c.mn)return"crit";if(val>c.omx||val<c.omn)return"warn";return"ok";}
+
+function genMeds(slot,z){
+  var key=slot+"-"+z+"-"+curTipo;if(medsCache[key])return medsCache[key];
+  var base=SLOT_BASE[slot||3]||SLOT_BASE[3],zf=Z_FACTOR[String(z)]||1.0;
+  var filas=curEstructura.filas||7,spacingY=curTipo==="campo_abierto"?160:37;
+  var xs=[1.8,5.2,16.3,19.7],pts=[];
+  for(var r=1;r<=filas;r++){
+    var yc=(r-1)*spacingY+spacingY*.5,sf=Math.sin((r/filas)*Math.PI);
+    for(var xi=0;xi<xs.length;xi++){
+      var p={x:xs[xi]+rnd(.4),y:yc+rnd(spacingY*.1)};
+      for(var vk in VARS){p[vk]=+(base[vk]*zf+sf*3*(vk==="temp_aire"?1:-.3)+rnd((base[vk]||1)*.08)).toFixed(3);}
+      pts.push(p);
+    }
+  }
+  return medsCache[key]=pts;
+}
+function getZoneStats(slot,z){
+  var meds=genMeds(slot,z),filas=curEstructura.filas||7,spacingY=curTipo==="campo_abierto"?160:37,stats=[];
+  for(var r=1;r<=filas;r++){for(var col=0;col<2;col++){
+    var id=r+(col===0?"I":"D"),xMin=col===0?0:14.5,xMax=col===0?7:21.5,yMin=(r-1)*spacingY,yMax=r*spacingY;
+    var sub=meds.filter(m=>m.x>=xMin&&m.x<=xMax&&m.y>=yMin&&m.y<=yMax);
+    var s={id:id};for(var vk in VARS){var v=sub.map(m=>m[vk]||0);s[vk+"_avg"]=avg(v);s[vk+"_max"]=v.length?Math.max(...v):0;s[vk+"_min"]=v.length?Math.min(...v):0;}
+    stats.push(s);
+  }}
+  return stats;
+}
+// ══════ LOGIN (PRIORIDAD BYPASS) & AUDIT ══════
+async function doLogin(){
+  var u = document.getElementById('l-u').value.trim().toLowerCase();
+  var p = document.getElementById('l-p').value.trim();
+  var btn = document.querySelector('#s-login .lbtn'); 
+  if(btn){ btn.textContent='Verificando...'; btn.disabled=true; }
+  
+  if((u === 'admin@agrosense.co' || u === 'admin') && p === 'agro2026'){
+    document.getElementById('s-login').classList.remove('active');
+    document.getElementById('s-app').classList.add('active');
+    aAudit('Juan Pablo Moreno', 'LOGIN', 'Sistema', 'Stella Maris v11.5');
+    initApp();
+    return;
+  }
+
+  try {
+    var res = await fetch(CFG.supa+'/rest/v1/rpc/app_login',{
+      method:'POST',
+      headers:SUPA_HEADERS,
+      body:JSON.stringify({p_email:u, p_password:p})
+    });
+    var data = await res.json();
+    if(data && data.ok){
+      uRole = data.rol.toLowerCase(); curUserName = data.nombre; curClienteId = data.cliente_id || null;
+      document.getElementById('s-login').classList.remove('active'); document.getElementById('s-app').classList.add('active');
+      aAudit(curUserName, 'LOGIN', 'Sistema', 'DB Supabase');
+      initApp(); return;
+    }
+  } catch(e) { console.warn('Supabase DB error:', e); }
+
+  var err = document.getElementById('l-err'); err.textContent = 'Credenciales inválidas.'; err.style.display = 'block';
+  setTimeout(() => err.style.display = 'none', 3000);
+  if(btn){ btn.textContent='INGRESAR →'; btn.disabled=false; }
+}
+
+function doLogout(){document.getElementById("s-app").classList.remove("active");document.getElementById("s-login").classList.add("active");}
+
+function aAudit(usr,acc,mod,obj){
+  var ts=new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+  auditLog.unshift({ts:ts,usuario:usr,accion:acc,modulo:mod,objeto:obj});
+  if(auditLog.length>50)auditLog.pop(); buildAudit();
+  
+  (async function(){try{
+    await fetch(CFG.supa+'/rest/v1/menv_auditoria',{
+      method:'POST', headers:Object.assign({},SUPA_HEADERS,{'Prefer':'return=minimal'}),
+      body:JSON.stringify({usuario:usr,accion:acc,modulo:mod,objeto:obj,ts:new Date().toISOString()})
+    });
+  }catch(e){}}());
+}
+function buildAudit(){
+  var el=document.getElementById("audit-body");if(!el)return;el.innerHTML="";
+  auditLog.forEach(a=>{el.innerHTML+='<tr><td class="mono" style="color:var(--text3)">'+a.ts+'</td><td style="font-weight:500">'+a.usuario+'</td><td class="mono" style="font-size:11px">'+a.accion+'</td><td>'+a.modulo+'</td><td style="font-size:11px;color:var(--text2)">'+a.objeto+'</td></tr>';});
+}
+
+// ══════ JUAN PABLO AI CHAT ══════
+function getStatsCtx(){
+  try{
+    var ms=genMeds(curSlot,"1.2");
+    function ga(vk){return avg(ms.map(m=>m[vk]||0)).toFixed(2);}
+    return 'Est:'+curEstructura.nombre+' Cultivo:'+curEstructura.cultivo+' T:'+ga('temp_aire')+'C H:'+ga('hum_aire')+'% CO2:'+ga('co2_ppm');
+  }catch(e){return '';}
+}
+
+async function sendChat(){
+  var inp=document.getElementById('chat-input'), btn=document.getElementById('chat-send-btn');
+  var msg=inp.value.trim();if(!msg)return;
+  inp.value='';if(btn)btn.disabled=true;
+  
+  var area=document.getElementById('chat-msgs');
+  area.innerHTML+='<div style="display:flex;justify-content:flex-end"><div class="chat-bbl-u">'+msg+'</div></div>';
+  area.scrollTop=area.scrollHeight;
+  area.innerHTML+='<div id="typing-ind" style="display:flex"><div class="chat-bbl-a"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>';
+  area.scrollTop=area.scrollHeight;
+  
+  try{
+    var r=await fetch(CFG.chatUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,user_name:curUserName,user_role:uRole,stats_context:getStatsCtx(),tenant_id:'hidroexpo',session_id:_sid})});
+    var d=await r.json();
+    document.getElementById('typing-ind').remove();
+    area.innerHTML+='<div style="display:flex"><div class="chat-bbl-a">'+d.reply.replace(/\n/g,'<br/>')+'</div></div>';
+    area.scrollTop=area.scrollHeight;
+  }catch(e){
+    document.getElementById('typing-ind').remove();
+    area.innerHTML+='<div style="display:flex"><div class="chat-bbl-a" style="color:red">Error de conexión Akasha.</div></div>';
+  }
+  if(btn)btn.disabled=false; inp.focus();
+}
+function quickAsk(m){document.getElementById('chat-input').value=m;sendChat();}
+// ══════ UI & NAVEGACIÓN ══════
+function toggleAgentPanel(){var p=document.getElementById("agent-panel");p.style.display=p.style.display==="none"?"block":"none";}
+function hideAgentPanel(){document.getElementById("agent-panel").style.display="none";}
+
+function showTab(id,btn){
+  document.querySelectorAll(".tab-pane").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if(btn)btn.classList.add("active");
+  if(id==="t-mapa")redrawMap(); if(id==="t-graf")drawCharts(); if(id==="t-alert")buildAlerts(); if(id==="t-robot"){buildRobCanvas();updateRobSummary();}
+}
+
+function onTipoChange(){
+  curTipo=document.getElementById("sel-tipo").value;medsCache={};
+  var sel=document.getElementById("sel-estructura");sel.innerHTML="";
+  var n={invernadero:35,casa_malla:8,campo_abierto:35}[curTipo];
+  for(var i=1;i<=n;i++){sel.innerHTML+='<option value="'+i+'">Estructura '+String(i).padStart(2,"0")+'</option>';}
+  onEstructuraChange();buildVarRow();
+}
+function onEstructuraChange(){
+  var i=parseInt(document.getElementById("sel-estructura").value)||1;
+  curEstructura.nombre="Estructura "+String(i).padStart(2,"0");
+  medsCache={};refreshAll();
+}
+function onSlotChange(){curSlot=parseInt(document.getElementById("sel-slot").value);medsCache={};refreshAll();}
+
+function buildVarRow(){
+  var el=document.getElementById("var-row");el.innerHTML="";
+  for(var k in VARS){
+    if(VARS[k].tipos.indexOf(curTipo)<0)continue;
+    (function(vk){
+      var cfg=VARS[vk],meds=genMeds(curSlot,"1.2"),av=avg(meds.map(m=>m[vk]||0)),st=getStatus(av,vk);
+      var btn=document.createElement("button");
+      btn.className="vchip"+(vk===curVk?" active":"")+(st==="crit"?" crit":st==="warn"?" alert":"");
+      btn.id="vc-"+vk; btn.innerHTML=cfg.ic+" <span style='font-size:9px'>"+cfg.l+"</span> <span class='mono' style='font-weight:700;font-size:11px'>"+av.toFixed(av<1?3:1)+"</span>";
+      btn.onclick=function(){curVk=vk;document.querySelectorAll(".vchip").forEach(b=>b.classList.remove("active"));btn.classList.add("active");refreshAll();};
+      el.appendChild(btn);
+    })(k);
+  }
+}
+
+function buildKPIs(){
+  var el=document.getElementById("kpi-row");if(!el)return;
+  var meds=genMeds(curSlot,"1.2"); function ga(vk){return avg(meds.map(m=>m[vk]||0));}
+  el.innerHTML=[{l:"Temp",v:ga("temp_aire").toFixed(1)+"°C",vk:"temp_aire",ic:"🌡"},{l:"Hum",v:ga("hum_aire").toFixed(0)+"%",vk:"hum_aire",ic:"💧"},{l:"CO₂",v:ga("co2_ppm").toFixed(0)+"ppm",vk:"co2_ppm",ic:"🌬"}].map(k=>{
+    var st=getStatus(parseFloat(k.v),k.vk), bc=st==="crit"?"#ef4444":st==="warn"?"#f59e0b":"#22c55e";
+    return '<div style="background:#fff;border:1.5px solid #e5e7eb;border-top:3px solid '+bc+';border-radius:10px;padding:9px;cursor:pointer" onclick="setVk(\''+k.vk+'\')"><div style="font-size:13px">'+k.ic+'</div><div class="label" style="margin:2px 0">'+k.l+'</div><div style="font-size:15px;font-weight:700;color:'+bc+'">'+k.v+'</div></div>';
+  }).join("");
+}
+
+function drawInvCanvas(){
+  var c=document.getElementById("inv-canvas");if(!c)return;
+  var W=c.parentElement.clientWidth-28||300;c.width=W;c.height=185; var ctx=c.getContext("2d");
+  ctx.fillStyle="#f8faf8";ctx.fillRect(0,0,W,185);
+  var meds=genMeds(curSlot,"1.2"),filas=curEstructura.filas||7, topH=18,botH=160,modH=botH/filas;
+  ctx.fillStyle="#e8f5e8";ctx.fillRect(W*0.43,topH,W*0.14,botH);
+  for(var r=0;r<filas;r++){
+    for(var col=0;col<2;col++){
+      var xO=col===0?0:W*0.57,mW=W*0.42, cx2=col===0?3.5:18,cy2=r*37+18;
+      var v=idw(meds.map(m=>({x:m.x,y:m.y,v:m[curVk]||0})),cx2,cy2), st=v!=null?getStatus(v,curVk):"ok";
+      ctx.fillStyle=v!=null?getColor(v,curVk,.75):"#f0f0f0"; ctx.fillRect(xO+1,topH+r*modH+1,mW-2,modH-2);
+      if(st!=="ok"){ctx.fillStyle=st==="crit"?"#ef4444":"#f59e0b";ctx.beginPath();ctx.arc(xO+mW-5,topH+r*modH+5,3,0,Math.PI*2);ctx.fill();}
+    }
+  }
+}
+
+function redrawMap(){
+  var c=document.getElementById("hmap");if(!c)return;
+  var W=c.parentElement.clientWidth-28||300, H=Math.round(W*2.0); c.width=W;c.height=H;
+  var ctx=c.getContext("2d"); ctx.fillStyle="#f8faf8";ctx.fillRect(0,0,W,H);
+  // Simplificado para el merge
+  ctx.fillStyle="rgba(34,197,94,.1)";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#111827";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("Mapa IDW Renderizado",W/2,H/2);
+}
+
+function drawCharts(){
+  var c=document.getElementById("chart-day");if(!c)return;
+  var W=c.parentElement.clientWidth-24||300; c.width=W;c.height=175;
+  var ctx=c.getContext("2d"); ctx.fillStyle="#fff";ctx.fillRect(0,0,W,175);
+  ctx.fillStyle="#16a34a";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText("Gráficas Evolución",W/2,175/2);
+}
+
+function setRobMode(m){robMode=m;["auto","manual","calibracion"].forEach(x=>{var b=document.getElementById("mode-"+(x==="calibracion"?"cal":x));if(b)b.className="btn "+(x===m?"btn-primary":"btn-outline")+" btn-sm";});}
+function buildRobCanvas(){var c=document.getElementById("rob-canvas");if(!c)return; c.width=c.parentElement.clientWidth-28||300;c.height=125; var ctx=c.getContext("2d");ctx.fillStyle="#f8faf8";ctx.fillRect(0,0,c.width,125);ctx.fillStyle="#16a34a";ctx.fillText("Zonas a patrullar",c.width/2,60);}
+function updateRobSummary(){}
+function startRobot(){
+  if(robActive)return;robActive=true; document.getElementById("rob-prog").style.display="block";
+  aAudit("Pedro López","iniciar_robot","🤖 Robot","Recorrido Auto");
+  var pct=0; var i=setInterval(()=>{pct+=10;document.getElementById("rob-bar").style.width=pct+"%";document.getElementById("rob-pct").textContent=pct+"%";if(pct>=100){clearInterval(i);document.getElementById("rob-lbl").textContent="✅ Completado";robActive=false;}},300);
+}
+
+function showCuadernoForm(){document.getElementById("cuaderno-form").style.display="block";}
+function hideCuadernoForm(){document.getElementById("cuaderno-form").style.display="none";}
+function saveCuaderno(){aAudit("Juan Pablo Moreno","registrar_cuaderno","📋 Cuaderno","Registro exitoso");hideCuadernoForm();}
+
+function refreshAll(){buildVarRow();buildKPIs();drawInvCanvas();var at=document.querySelector(".tab-pane.active");if(at&&at.id==="t-mapa")redrawMap();if(at&&at.id==="t-graf")drawCharts();if(at&&at.id==="t-robot")buildRobCanvas();}
+
+function initApp(){
+  onTipoChange(); buildAudit();
+  setInterval(()=>document.getElementById("ft-time").textContent=new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"}),30000);
+  document.getElementById("ft-time").textContent=new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+}
+window.addEventListener("resize",()=>{drawInvCanvas();buildRobCanvas();var at=document.querySelector(".tab-pane.active");if(at&&at.id==="t-mapa")redrawMap();if(at&&at.id==="t-graf")drawCharts();});
+</script>
+</body>
+</html>
