@@ -188,7 +188,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .bxs{padding:4px 10px;font-size:11px}
 .nav-btn{flex-shrink:0;border:none;background:transparent;color:var(--text2);padding:10px 13px;font-size:12px;font-weight:500;white-space:nowrap;border-bottom:2.5px solid transparent;cursor:pointer;transition:all .15s}
 .nav-btn.active{border-bottom-color:var(--green);color:var(--green);background:var(--greenl);font-weight:700}
-.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}#v-db.active{display:flex!important}#v-db{display:none!important}#v-db.active{display:flex!important}#v-db{display:none!important}
+.tab-pane{display:none}.tab-pane.active{display:block;animation:fadeUp .25s ease}#v-db.active{display:flex!important}#v-db{display:none!important}
 .vchip{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;white-space:nowrap;font-weight:500}
 .vchip.active{border-color:var(--green2);background:var(--greenl);color:var(--green);font-weight:700}
 .vchip.vwn{border-color:var(--amberb);background:var(--amberl);color:var(--amber)}
@@ -765,6 +765,12 @@ function openStruct(tipo,num){
     if(hb)hb.className='badge '+(alertCnt>0?'bcr':'bok')+' ';
   }
   aAudit(uRole==="admin"?"Juan Pablo":"Carlos","abrir_estructura","Dashboard",curSt.n);
+  var _h=document.getElementById('st-hero');
+  if(_h){_h.style.display='block';
+    var _hn=document.getElementById('st-hero-title');if(_hn)_hn.textContent=curSt.n;
+    var _hs=document.getElementById('st-hero-sub');if(_hs)_hs.textContent=curSt.zn+' zonas 7x36m '+curSt.cult+' Sem.'+curSt.sem;
+  }
+  setTimeout(function(){drawSVC();},80);
 }
 function openZone(zid){curZone=zid;navTo("zn");aAudit(uRole==="admin"?"Juan Pablo":"Carlos","abrir_zona","Dashboard","Zona "+zid+" · "+curSt.n);}
 function openZDB(zid){curZone=zid;navTo("db");rDB();}
@@ -1348,42 +1354,6 @@ function _updateTopKPIs(){
 
 // ── Hero image for structures ──
 var _HERO_SRC = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBA...";
-
-// ── Override initApp to update topbar ──
-var _origInitApp = initApp;
-function initApp(){
-  _origInitApp();
-  setTimeout(_updateTopKPIs,500);
-  setTimeout(function(){if(typeof loadSystemStatus==="function")loadSystemStatus();},1500);
-}
-
-// ── Override openStruct to show hero ──
-var _origOpenStruct = openStruct;
-function openStruct(tipo,num){
-  _origOpenStruct(tipo,num);
-  var hero=document.getElementById('st-hero');
-  if(hero){
-    hero.style.display='block';
-    var hn=document.getElementById('st-hero-title');
-    if(hn)hn.textContent=curSt.n;
-    var hs=document.getElementById('st-hero-sub');
-    if(hs)hs.textContent=curSt.zn+' zonas · 7×36m · '+curSt.cult+' · Sem.'+curSt.sem;
-    var hb=document.getElementById('st-hero-badge');
-    var ac=ALERTS_D.filter(function(a){return!a.ok;}).length;
-    if(hb){hb.innerHTML=ac>0?'🔴 '+ac+' alertas':'🟢 Normal';hb.className='badge '+(ac>0?'bcr':'bok');}
-  }
-  setTimeout(function(){drawSVC();},80);
-}
-
-// ── Fix showDT to force canvas render ──
-var _origShowDT = showDT;
-function showDT(id,btn){
-  _origShowDT(id,btn);
-  if(id==='dt-dash')setTimeout(function(){buildKPIs();buildLM();drawDBCV();},80);
-  if(id==='dt-mapa')setTimeout(function(){redrawMap();},80);
-  if(id==='dt-graf')setTimeout(function(){drawCharts();},80);
-  if(id==='dt-robot')setTimeout(function(){buildRobCV();updRobSum();},80);
-}
 
 </script>
 </body>
